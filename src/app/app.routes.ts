@@ -1,23 +1,11 @@
 import {Routes} from '@angular/router';
-import {About} from './about/about';
-import {Home} from './home/home';
-import {RepoBrowser} from './github/repo-browser/repo-browser';
-import {RepoList} from './github/repo-list/repo-list';
-import {RepoDetail} from './github/repo-detail/repo-detail';
+import {CollectorComponent} from "./collector/collector.component";
+import {RatingComponent} from "./rating/rating.component";
+import {NotifierComponent} from "./notifier/notifier.component";
 
 export const rootRouterConfig: Routes = [
-  {path: '', redirectTo: 'home', pathMatch: 'full'},
-  {path: 'home', component: Home},
-  {path: 'about', component: About},
-  {path: 'github', component: RepoBrowser,
-    children: [
-      {path: '', component: RepoList},
-      {path: ':org', component: RepoList,
-        children: [
-          {path: '', component: RepoDetail},
-          {path: ':repo', component: RepoDetail}
-        ]
-      }]
-  }
+  {path: '', redirectTo: 'collector', pathMatch: 'full'},
+  {path: 'collector', component: CollectorComponent},
+  {path: 'rating', component: RatingComponent},
+  {path: 'notifier', component: NotifierComponent}
 ];
-
