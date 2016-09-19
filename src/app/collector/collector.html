@@ -1,1 +1,15 @@
-<h4>Collector's placeholder</h4>
+<div class="container">
+  <div class="row">
+    <h4>{{caption}}</h4>
+  </div>
+  <div class="row">
+    <ul class="list-unstyled">
+      <li *ngFor="let headline of headlines; let i=index; let o=odd;">
+        <div class="row" [style.backgroundColor]="o ? 'Khaki':'ivory'" >
+          <input type="checkbox" #cb (change)="onChange(headline, cb.checked)">
+          {{i+1}} - {{headline}}
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
