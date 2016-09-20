@@ -8,9 +8,11 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "moduleResolution": "node",
-     "types": [
+
+    "types": [
        "core-js",
-       "node"
+       "node",
+       "firebase"
      ]
   },
   "exclude": [
