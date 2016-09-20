@@ -5,9 +5,11 @@
   <div class="row">
     <ul class="list-unstyled">
       <li *ngFor="let headline of headlines; let i=index; let o=odd;">
-        <div class="row" [style.backgroundColor]="o ? 'Khaki':'ivory'" >
-          <input type="checkbox" #cb (change)="onChange(headline, cb.checked)">
-          {{i+1}} - {{headline}}
+        <div [hidden]="cb.checked" class="row" [style.backgroundColor]="o ? 'Khaki':'ivory'">
+          <input type="checkbox" #cb
+                 (change)="onChange(headline, cb.checked)">
+          {{i+1}} - {{headline.title}}
+          <a href="{{headline.link}}">(read more)</a>
         </div>
       </li>
     </ul>
