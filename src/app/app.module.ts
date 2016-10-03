@@ -10,8 +10,9 @@ import {NavigationComponent} from "./navigation/navigation.component";
 import {CollectorComponent} from "./collector/collector.component";
 import {RatingComponent} from "./rating/rating.component";
 import {NotifierComponent} from "./notifier/notifier.component";
-import { AngularFireModule } from 'angularfire2';
+import {AngularFireModule} from 'angularfire2';
 import {OrderByPipe} from "./pipes/orderby.pipe";
+import {NotifierService} from "./notifier/notifier.service";
 // import {O_RDONLY} from "constants";
 // import {OrderByPipe} from "./pipes/orderby.pipe";
 
@@ -26,6 +27,7 @@ export const firebaseConfig = {
   declarations: [
     AppComponent, NavigationComponent, CollectorComponent,
     RatingComponent, NotifierComponent, OrderByPipe
+
   ],
   schemas     : [CUSTOM_ELEMENTS_SCHEMA],
   imports     : [
