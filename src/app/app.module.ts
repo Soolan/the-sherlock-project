@@ -11,6 +11,8 @@ import {CollectorComponent} from "./collector/collector.component";
 import {RatingComponent} from "./rating/rating.component";
 import {NotifierComponent} from "./notifier/notifier.component";
 import { AngularFireModule } from 'angularfire2';
+// import {O_RDONLY} from "constants";
+// import {OrderByPipe} from "./pipes/orderby.pipe";
 
 export const firebaseConfig = {
   apiKey: "AIzaSyA8C9a7wZ9r-5BsMXJbP3-6_raliTVkHpk",
@@ -20,10 +22,20 @@ export const firebaseConfig = {
 }
 
 @NgModule({
-  declarations: [AppComponent, NavigationComponent, CollectorComponent, RatingComponent, NotifierComponent],
+  declarations: [
+    AppComponent, NavigationComponent, CollectorComponent,
+    RatingComponent, NotifierComponent
+  ],
   schemas     : [CUSTOM_ELEMENTS_SCHEMA],
-  imports     : [BrowserModule, FormsModule, HttpModule, RouterModule.forRoot(rootRouterConfig), AngularFireModule.initializeApp(firebaseConfig),],
-  providers   : [{provide: LocationStrategy, useClass: HashLocationStrategy}],
+  imports     : [
+    BrowserModule, FormsModule, HttpModule,
+    RouterModule.forRoot(rootRouterConfig),
+    AngularFireModule.initializeApp(firebaseConfig)
+  ],
+  providers   : [
+    {provide: LocationStrategy, useClass: HashLocationStrategy}
+    ],
+  // pipes       : [OrderByPipe],
   bootstrap   : [AppComponent]
 })
 export class AppModule {
