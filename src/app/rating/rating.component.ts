@@ -2,13 +2,11 @@
 import {Component} from '@angular/core';
 import {RatingLogic} from './rating.logic';
 import {RatingService} from './rating.service';
-import {OrderByPipe} from "../pipes/orderby.pipe";
 
 @Component({
   selector: 'sh-rating',
   templateUrl: './rating.html',
-  providers: [RatingLogic, RatingService],
-  //pipes: [OrderByPipe]
+  providers: [RatingLogic, RatingService]
 })
 export class RatingComponent {
   private ratingService;

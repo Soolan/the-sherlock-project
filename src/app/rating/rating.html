@@ -17,7 +17,7 @@
   </div>
   <div class="col-md-5">
     <h3>Ranked News (Rating Component)</h3>
-    <div *ngFor="let item of ratedNews">
+    <div *ngFor="let item of ratedNews| orderBy:['rank']:true">
       {{item.title}} - {{item.rank}} - <a href="{{item.link}}">more</a>
     </div>
   </div>
