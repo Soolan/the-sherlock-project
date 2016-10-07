@@ -8,7 +8,9 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "moduleResolution": "node",
-
+    "typeRoots": [
+      "./node_modules/@types"
+    ],
     "types": [
        "core-js",
        "node",

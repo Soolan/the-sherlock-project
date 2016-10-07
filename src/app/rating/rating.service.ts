@@ -1,7 +1,7 @@
 import {Injectable} from "@angular/core";
 import {
   FirebaseListObservable, AngularFire
-} from "angularfire2/angularfire2";
+} from "angularfire2";
 import {RatingLogic} from "./rating.logic";
 
 @Injectable()
