@@ -1,12 +1,11 @@
 import {Component} from '@angular/core';
 import {CollectorService} from './collector.service';
-import {FirebaseListObservable, AngularFire} from "angularfire2";
-import {OrderByPipe} from "../pipes/orderby.pipe";
+import {AngularFire, FirebaseListObservable} from "angularfire2";
+
 @Component({
   selector: 'sh-collector',
-  templateUrl: './collector.html',
-  providers: [CollectorService],
-  pipes: [OrderByPipe]
+  templateUrl: './collector.html'
+  // providers: []
 })
 export class CollectorComponent {
   caption = "Some news worth investigating";
