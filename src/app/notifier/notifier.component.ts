@@ -1,31 +1,28 @@
 import {Component} from '@angular/core';
 import {NotifierConfig} from './notifier.config';
 import {
-  AngularFire,
-  FirebaseObjectObservable,
-  FirebaseListObservable
+  AngularFire, FirebaseObjectObservable, FirebaseListObservable
 } from 'angularfire2';
 import {NotifierService} from "./notifier.service";
-import {CollectorService} from "../collector/collector.service";
-import {RatingService} from "../rating/rating.service";
-import {RatingLogic} from "../rating/rating.logic";
 
 @Component({
   selector: 'sh-notifier',
-  templateUrl: './notifier.html',
-  providers: [NotifierService, CollectorService, RatingService, RatingLogic]
+  templateUrl: './notifier.html'
 })
 export class NotifierComponent {
   private notify   = [true, false];
   private notifier = ['app', 'email'];
   private threshold= ['high rated', 'medium rated', 'low rated'];
   private model    = new NotifierConfig(false,'app','low rated');
-
   private config: FirebaseObjectObservable<any>;
   private ratedNews: FirebaseListObservable<any>;
+  private notifierService: NotifierService;
+
+
   constructor(af: AngularFire, ns: NotifierService) {
-    this.ratedNews = af.database.list('Notifier/rated-news');
     this.config = af.database.object('/Notifier/config', {preserveSnapshot: true});
+    this.ratedNews = af.database.list('Notifier/rated-news');
+    this.notifierService = ns;
     this.updateUI();
   }
 
@@ -39,10 +36,14 @@ export class NotifierComponent {
           'threshold': snapshot.val().threshold
         };
       } else {
-        //object doesn't exist save the initialized model to db
+        //object doesn't exist
         this.config.set(this.model);
       }
-      // ToDo: Schedule a cron job based on the values of UI
+      var notify   = this.model.notify;
+      var notifier = this.model.notifier;
+      var threshold = this.model.threshold;
+      if(notify == true)
+        this.notifierService.scheduler(notifier, threshold);
     });
   }
 

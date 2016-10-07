@@ -13,8 +13,9 @@ import {NotifierComponent} from "./notifier/notifier.component";
 import {AngularFireModule} from 'angularfire2';
 import {OrderByPipe} from "./pipes/orderby.pipe";
 import {NotifierService} from "./notifier/notifier.service";
-// import {O_RDONLY} from "constants";
-// import {OrderByPipe} from "./pipes/orderby.pipe";
+import {CollectorService} from "./collector/collector.service";
+import {RatingService} from "./rating/rating.service";
+import {RatingLogic} from "./rating/rating.logic";
 
 export const firebaseConfig = {
   apiKey: "AIzaSyA8C9a7wZ9r-5BsMXJbP3-6_raliTVkHpk",
@@ -23,11 +24,14 @@ export const firebaseConfig = {
   storageBucket: "the-sherlock-project.appspot.com"
 }
 
+export const sendGridConfig = {
+  apiKey: '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'
+}
+
 @NgModule({
   declarations: [
     AppComponent, NavigationComponent, CollectorComponent,
     RatingComponent, NotifierComponent, OrderByPipe
-
   ],
   schemas     : [CUSTOM_ELEMENTS_SCHEMA],
   imports     : [
@@ -36,9 +40,9 @@ export const firebaseConfig = {
     AngularFireModule.initializeApp(firebaseConfig)
   ],
   providers   : [
-    {provide: LocationStrategy, useClass: HashLocationStrategy}
-    ],
-  // pipes       : [],
+    {provide: LocationStrategy, useClass: HashLocationStrategy},
+    CollectorService, RatingService, RatingLogic, NotifierService
+  ],
   bootstrap   : [AppComponent]
 })
 export class AppModule {

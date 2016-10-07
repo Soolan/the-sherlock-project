@@ -4,8 +4,8 @@ import {AngularFire, FirebaseListObservable} from "angularfire2";
 
 @Component({
   selector: 'sh-collector',
-  templateUrl: './collector.html',
-  providers: [CollectorService]
+  templateUrl: './collector.html'
+  // providers: []
 })
 export class CollectorComponent {
   caption = "Some news worth investigating";

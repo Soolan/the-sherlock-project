@@ -1,12 +1,10 @@
 // src/app/rating/rating.component.ts
 import {Component} from '@angular/core';
-import {RatingLogic} from './rating.logic';
 import {RatingService} from './rating.service';
 
 @Component({
   selector: 'sh-rating',
-  templateUrl: './rating.html',
-  providers: [RatingLogic, RatingService]
+  templateUrl: './rating.html'
 })
 export class RatingComponent {
   private ratingService;
