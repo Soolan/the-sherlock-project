@@ -16,6 +16,8 @@ import {NotifierService} from "./notifier/notifier.service";
 import {CollectorService} from "./collector/collector.service";
 import {RatingService} from "./rating/rating.service";
 import {RatingLogic} from "./rating/rating.logic";
+import {EvidenceComponent} from "./evidence/evidence.component";
+import {EvidenceService} from "./evidence/evidence.service";
 
 export const firebaseConfig = {
   apiKey: "AIzaSyA8C9a7wZ9r-5BsMXJbP3-6_raliTVkHpk",
@@ -31,7 +33,8 @@ export const sendGridConfig = {
 @NgModule({
   declarations: [
     AppComponent, NavigationComponent, CollectorComponent,
-    RatingComponent, NotifierComponent, OrderByPipe
+    RatingComponent, NotifierComponent, EvidenceComponent,
+    OrderByPipe
   ],
   schemas     : [CUSTOM_ELEMENTS_SCHEMA],
   imports     : [
@@ -41,7 +44,8 @@ export const sendGridConfig = {
   ],
   providers   : [
     {provide: LocationStrategy, useClass: HashLocationStrategy},
-    CollectorService, RatingService, RatingLogic, NotifierService
+    CollectorService, RatingService, RatingLogic, NotifierService,
+    EvidenceService
   ],
   bootstrap   : [AppComponent]
 })

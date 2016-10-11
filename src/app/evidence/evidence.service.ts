@@ -1,10 +1,11 @@
 import {Injectable} from "@angular/core";
+import forEach = require("core-js/fn/array/for-each");
 
 @Injectable()
 export class EvidenceService {
   wordcounts(article:string) {
     var allWords = this.extractWords(article);
-    var instances = this.wordInstances(allWords);
+    return this.wordInstances(allWords);
   }
 
   extractWords(article:string) {
@@ -26,11 +27,19 @@ export class EvidenceService {
         instances[word] = 1;
       }
     });
-    // sort the instances descending based on occurrence
-    instances = Object.keys(instances).sort(
+    return this.sortWords(instances);
+  }
+
+  // sort the words and save them as an array of objects
+  sortWords (instances) {
+    var words = [];
+    var sortedWords = Object.keys(instances).sort(
       function(a,b){
         return instances[b]-instances[a]
       });
-    return instances;
+    sortedWords.forEach(function (word) {
+      words.push({key:word, value:instances[word]});
+    });
+    return words;
   }
 }
