@@ -1,4 +1,4 @@
 <h4>Evidence's placeholder</h4>
-<div *ngFor="let word of words">
+<div *ngFor="let word of words|async">
   {{word.key}} - {{word.value}}
 </div>
