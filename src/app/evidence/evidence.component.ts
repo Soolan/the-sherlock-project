@@ -7,6 +7,7 @@ import {EvidenceService} from "./evidence.service";
 })
 export class EvidenceComponent {
   private words;
+  private norms;
   private evidenceService:EvidenceService;
   private article:string =
     "England captain Wayne Rooney says he is in a difficult period after he was dropped for Tuesday\'s World Cup qualifier against Slovenia."+
@@ -17,6 +18,7 @@ export class EvidenceComponent {
     this.evidenceService = es;
     this.evidenceService.wordCounts(this.url);
     this.words = this.evidenceService.getWords();
+    this.norms = this.evidenceService.getNormalized();
     console.log(this.evidenceService);
   }
 }

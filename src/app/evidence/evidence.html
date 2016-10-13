@@ -1,5 +1,25 @@
-<h4>Evidence's placeholder</h4>
-<div *ngFor="let word of evidenceService.words">
-  <strong>{{word.key}}</strong>
-  ({{word.value}})
+<div class="col-md-6">
+  <div class="panel panel-default ">
+    <!-- Default panel contents -->
+    <div class="panel-heading">Processing words</div>
+    <!-- Table -->
+    <table class="table">
+      <thead>
+      <tr>
+        <th>#</th>
+        <th>Words</th>
+        <th>Raw Value</th>
+        <th>Normalized</th>
+      </tr>
+      </thead>
+      <tbody *ngFor="let word of evidenceService.words; let i=index">
+      <tr>
+        <th>{{i+1}}</th>
+        <td>{{word.key}}</td>
+        <td>{{word.value}}</td>
+        <td>{{word.value/evidenceService.normFactor}} </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
 </div>

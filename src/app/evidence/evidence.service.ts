@@ -8,6 +8,7 @@ export class EvidenceService {
   private http;
   private article='';
   private words;
+  private normFactor;
   constructor (http: Http) {
     this.http = http;
   }
@@ -17,28 +18,34 @@ export class EvidenceService {
     return this.words;
   }
 
+  getNormalized() {
+    return this.normFactor;
+  }
+
   wordCounts(url) {
     this.getArticle(url)
       .subscribe(
-        // data => this.article = data.forEach(this.findContentKeys('content')));
-        // data => console.log(data));
         data => {
           this.findKey(data, 'content');
           this.words= this.countInstances(this.extractWords(this.article));
-        }
-        )
-    ;
+          this.normFactor = this.calculateNorm(this.words);
+      });
+  }
 
-    // var allWords = this.extractWords(this.article);
-    // return this.wordInstances(allWords);
-
+  calculateNorm (rawWords) {
+    // Norm factor = Square Root of (Sum of(each word value power 2));
+    var total = 0;
+    rawWords.forEach(function (w) {
+      total += w.value * w.value;
+    });
+    return Math.sqrt(total);
   }
 
   findKey(object, myKey) {
     for (var key in object) {
       if (!!object[key] && typeof(object[key])=="object") {
         this.findKey(object[key], myKey );
-      } else if (key == myKey || typeof (key) == "string") {
+      } else if (key == myKey || typeof (key) == "string" && key != 'class' && key != 'id' && key != 'href') {
         // console.log(object[key]);
         this.article += object[key];
       }
