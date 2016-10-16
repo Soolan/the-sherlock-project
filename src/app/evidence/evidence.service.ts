@@ -13,15 +13,6 @@ export class EvidenceService {
     this.http = http;
   }
 
-  getWords() {
-    console.log(this.words);
-    return this.words;
-  }
-
-  getNormalized() {
-    return this.normFactor;
-  }
-
   wordCounts(url) {
     this.getArticle(url)
       .subscribe(
@@ -29,7 +20,7 @@ export class EvidenceService {
           this.findKey(data, 'content');
           this.words= this.countInstances(this.extractWords(this.article));
           this.normFactor = this.calculateNorm(this.words);
-      });
+        });
   }
 
   calculateNorm (rawWords) {
@@ -90,7 +81,6 @@ export class EvidenceService {
     sortedWords.forEach(function (word) {
       words.push({key:word, value:instances[word]});
     });
-    // console.log(words);
     return words;
   }
 }

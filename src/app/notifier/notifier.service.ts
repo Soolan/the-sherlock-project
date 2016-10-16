@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {CollectorService} from '../collector/collector.service';
 import {RatingService} from '../rating/rating.service';
-import {FirebaseListObservable, AngularFire} from 'angularfire2';
+import {FirebaseListObservable, AngularFire, FirebaseObjectObservable} from 'angularfire2';
 import {Http, Headers, Response, RequestOptions} from "@angular/http";
 
 @Injectable()
@@ -16,6 +16,7 @@ export class NotifierService {
   private maintenance: FirebaseListObservable<any>;
   private eraseFactor = 72; // 3 days (72 hours)
   private http;
+  private duplicate;
 
   constructor(cs: CollectorService, rs: RatingService,
               af: AngularFire, http: Http) {
@@ -24,7 +25,6 @@ export class NotifierService {
     this.angularFire = af;
     this.http = http;
     this.items =this.angularFire.database.list('/Notifier/rated-news');
-    // this.items.remove();
   }
 
   scheduler(notifier: string, threshold: string) {
@@ -35,7 +35,7 @@ export class NotifierService {
     if(this.task != null)
       this.task.stop();
     var self = this;
-    this.task = this.cron.schedule('*/20 * * * *', function () {
+    this.task = this.cron.schedule('*/10 * * * *', function () {
         self.removeOldNews();
         self.collectRateNotify(notifier, threshold);
       });
@@ -48,15 +48,15 @@ export class NotifierService {
       .list('/Notifier/rated-news');
     this.collectorService.getHeadlines().subscribe(
       data => { data.forEach((item: any) => {
-        var trendRank = self.ratingService.rl.rateTrends(  item.title + item.description);
+        var trendRank = self.ratingService.rl.rateTrends(item.title + item.description);
         var dateRank  = self.ratingService.rl.rateDate(item.pubDate);
         var newsRank  = trendRank + dateRank;
-        console.log(
-          'newsRank:'+newsRank,
-          'date:'+dateRank,
-          'trendRank:'+trendRank,
-          'thresholdRank:'+thresholdRank
-        );
+        // console.log(
+        //   'newsRank:'+newsRank,
+        //   'date:'+dateRank,
+        //   'trendRank:'+trendRank,
+        //   'thresholdRank:'+thresholdRank,
+        // );
         if (newsRank >= thresholdRank) {
           var ratedItem = {
             'title': item.title,
@@ -65,14 +65,38 @@ export class NotifierService {
             'date': item.pubDate?item.pubDate:'',
             'link': item.link
           };
-          self.items.push(ratedItem);
-          if (notifier == 'email'){
-            this.emailNotification(ratedItem);
+          this.checkDuplicate(item.title);
+          if(this.duplicate == false) {
+            self.items.push(ratedItem);
+            if (notifier == 'email'){
+              this.emailNotification(ratedItem);
+            }
           }
         }
       });
-
     })
+  }
+
+  checkDuplicate(newsTitle) {
+    var self = this;
+    var notifier =
+      this.angularFire.database.object('/Notifier/rated-news', {preserveSnapshot: true});
+
+    notifier.subscribe(snapshot => {
+      if (snapshot.exists()) {
+        //object exists
+        notifier._ref.once("value")
+          .then(snapshots => {
+            snapshots.forEach(
+              function (snapshot) {
+                self.duplicate = snapshot.child("title").val() == newsTitle;
+              })
+          });
+      } else {
+        //object doesn't exist
+        self.duplicate = false;
+      }
+    });
   }
 
   thresholdToRank(threshold) {
