@@ -35,7 +35,7 @@ export class NotifierService {
     if(this.task != null)
       this.task.stop();
     var self = this;
-    this.task = this.cron.schedule('*/10 * * * *', function () {
+    this.task = this.cron.schedule('*/15 * * * *', function () {
         self.removeOldNews();
         self.collectRateNotify(notifier, threshold);
       });

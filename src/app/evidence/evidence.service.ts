@@ -9,18 +9,32 @@ export class EvidenceService {
   private article='';
   private words;
   private normFactor;
+  private corpus;
   constructor (http: Http) {
     this.http = http;
   }
 
   wordCounts(url) {
+    //this.resetCounters();
     this.getArticle(url)
       .subscribe(
         data => {
-          this.findKey(data, 'content');
+          this.findInKey(data, 'content');
           this.words= this.countInstances(this.extractWords(this.article));
           this.normFactor = this.calculateNorm(this.words);
         });
+  }
+
+  resetCounters() {
+    this.article = null;
+    this.words = null;
+    this.normFactor = null;
+  }
+  calculateTFIDF (word) {
+    // log((# of docs in the corpus)/(1+# of docs contain a specific word))
+    var corpusSize   = 1000; //this.corpus.length;
+    var docsWithWord = 55; //getDocsWith(word).length;
+    return Math.log2(corpusSize/(1+docsWithWord));
   }
 
   calculateNorm (rawWords) {
@@ -32,10 +46,11 @@ export class EvidenceService {
     return Math.sqrt(total);
   }
 
-  findKey(object, myKey) {
+  findInKey(object, myKey) {
     for (var key in object) {
-      if (!!object[key] && typeof(object[key])=="object") {
-        this.findKey(object[key], myKey );
+      // console.log(!!object[key])
+      if (object[key] && typeof(object[key])=="object") {
+        this.findInKey(object[key], myKey );
       } else if (key == myKey || typeof (key) == "string" && key != 'class' && key != 'id' && key != 'href') {
         // console.log(object[key]);
         this.article += object[key];
@@ -73,14 +88,18 @@ export class EvidenceService {
 
   // sort the words and save them as an array of objects
   sortWords (instances) {
+    var self = this;
     var words = [];
+    console.log(words);
     var sortedWords = Object.keys(instances).sort(
       function(a,b){
         return instances[b]-instances[a]
       });
     sortedWords.forEach(function (word) {
-      words.push({key:word, value:instances[word]});
+      words.push({key:word, value:instances[word], tfidf:self.calculateTFIDF(word)});
     });
+    console.log(words);
+
     return words;
   }
 }
