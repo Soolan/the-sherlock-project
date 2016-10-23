@@ -16,3 +16,4 @@ import 'rxjs/Rx';
 // Also see src/typings.d.ts as you also need to run `typings install x` where `x` is your module
 import 'node-cron';
 // import * as sendgrid from 'sendgrid';
+require("../node_modules/angular2-busy/build/style/busy.css");

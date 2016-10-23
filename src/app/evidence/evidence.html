@@ -1,30 +1,49 @@
 <div class="container">
   <div class="row">
-    <div class="col-md-6">
-      <div class="panel panel-default ">
-        <!-- Default panel contents -->
-        <div class="panel-heading">Available News Items</div>
-        <ul class="list-unstyled">
-          <li *ngFor="let item of newsItems">
-            <div class="media-right">
-            <input type="radio" name="news" (click)="onSelect(item)">
-            {{item.title}}
-            <a href="{{item.link}}">(read more)</a>
+    <div class="col-md-5">
+      <div class="row">
+        <div class="panel panel-default ">
+          <!-- Default panel contents -->
+          <div class="panel-heading">Available News Items</div>
+          <ul class="list-unstyled">
+            <li *ngFor="let item of newsItems">
+              <div class="media-right">
+                <input type="radio" name="news" (click)="onSelect(item)">
+                {{item.title}} <a href="{{item.link}}">(read more)</a> <br>
               </div>
-          </li>
-        </ul>
-        <div class="input-group">
-          <input type="text" class="form-control" placeholder="other news/article url...">
-          <span class="input-group-btn">
-        <button class="btn btn-default" type="button">Go!</button>
-      </span>
-        </div><!-- /input-group -->
+            </li>
+          </ul>
+          <div class="input-group">
+            <input type="text" class="form-control" placeholder="other news/article url...">
+            <span class="input-group-btn">
+              <button class="btn btn-default" type="button">Go!</button>
+            </span>
+          </div><!-- /input-group -->
+        </div>
+      </div>
+      <div class="row">
+        <div class="panel panel-default ">
+          <!-- Default panel contents -->
+          <div class="panel-heading">Extracted Contents</div>
+          <p class="news-contents">
+            {{evidenceService.article}}
+          </p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="panel panel-default ">
+          <!-- Default panel contents -->
+          <div class="panel-heading">Nominated Keywords</div>
+            <input type="text" [(ngModel)]="supportKeywords" class="form-control" placeholder="Comma separated support keywords">
+            <input type="text" [(ngModel)]="mainKeyword" class="form-control" placeholder="Keyword of interest">
+            <button type="submit" (click)="buildCorpus()" class="btn btn-default btn-block">Fetch Articles For Corpus</button>
+        </div>
       </div>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-7">
       <div class="panel panel-default ">
         <!-- Default panel contents -->
-        <div class="panel-heading">Processing words</div>
+        <div class="panel-heading">Processed words</div>
         <!-- Table -->
         <table class="table">
           <thead>

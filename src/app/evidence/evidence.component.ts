@@ -1,17 +1,23 @@
 import {Component} from '@angular/core';
 import {EvidenceService} from "./evidence.service";
 import {AngularFire} from "angularfire2";
+import {CorpusService} from "./corpus.service";
 
 @Component({
   selector: 'sh-evidence',
-  templateUrl: 'evidence.html'
+  templateUrl: 'evidence.html',
+  styleUrls  : ['./app/evidence/evidence.css']
 })
 export class EvidenceComponent {
   private evidenceService;
+  private corpusService;
   private newsItems;
+  private supportKeywords;
+  private mainKeyword;
 
-  constructor (es:EvidenceService, af: AngularFire) {
+  constructor (es:EvidenceService, af: AngularFire, private cs: CorpusService) {
     this.evidenceService = es;
+    this.corpusService   = cs;
     af.database.list('/Notifier/rated-news', {
       query: {
         orderByChild: 'rank',
@@ -19,7 +25,6 @@ export class EvidenceComponent {
       }})
       .subscribe(data => {
           this.newsItems = data;
-        // console.log(this.newsItems);
         }
       );
   }
@@ -27,12 +32,12 @@ export class EvidenceComponent {
   onSelect(item){
     this.evidenceService.resetCounters();
     this.evidenceService.wordCounts(this.getQueryUrl(item.link));
-    // if(isChecked) {
-    //   this.evidenceService.wordCounts(this.getQueryUrl(item.link));
-    // } else {
-    //   this.evidenceService.resetCounters();
-    // }
-    // console.log(this.evidenceService);
+  }
+
+  buildCorpus() {
+    // ToDo: build the corpus
+    // Fetch news for the main
+    this.corpusService.corpusBuilder(this.mainKeyword, this.supportKeywords);
   }
 
   getQueryUrl (link) {
