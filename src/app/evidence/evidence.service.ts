@@ -16,7 +16,7 @@ export class EvidenceService {
 
   wordCounts(url) {
     //this.resetCounters();
-    this.getArticle(url)
+    this.getArticle(this.getQueryUrl(url))
       .subscribe(
         data => {
           this.findInKey(data, 'content');
@@ -101,5 +101,12 @@ export class EvidenceService {
     console.log(words);
 
     return words;
+  }
+
+  getQueryUrl (link) {
+    return "https://query.yahooapis.com/v1/public/yql?" +
+      "q=select * from html where url=\""+ link +"\" and "+
+      "xpath=\"//*[contains(@class,\'paragraph\')]|//p\"" +
+      "&format=json&diagnostics=true&callback=";
   }
 }

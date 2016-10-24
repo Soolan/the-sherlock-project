@@ -20,6 +20,7 @@ import {EvidenceComponent} from "./evidence/evidence.component";
 import {EvidenceService} from "./evidence/evidence.service";
 import {BusyModule} from 'angular2-busy';
 import {AiComponent} from './ai/ai.component';
+import {CorpusService} from "./evidence/corpus.service";
 
 export const firebaseConfig = {
   apiKey: "AIzaSyA8C9a7wZ9r-5BsMXJbP3-6_raliTVkHpk",
@@ -53,7 +54,7 @@ export const googleSearchConfig = {
   providers   : [
     {provide: LocationStrategy, useClass: HashLocationStrategy},
     CollectorService, RatingService, RatingLogic, NotifierService,
-    EvidenceService
+    EvidenceService, CorpusService
   ],
   bootstrap   : [AppComponent]
 })

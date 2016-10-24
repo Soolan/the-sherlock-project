@@ -2,6 +2,7 @@ import {Component} from '@angular/core';
 import {EvidenceService} from "./evidence.service";
 import {AngularFire} from "angularfire2";
 import {CorpusService} from "./corpus.service";
+import {supportsState} from "@angular/platform-browser/src/browser/location/history";
 
 @Component({
   selector: 'sh-evidence',
@@ -31,7 +32,7 @@ export class EvidenceComponent {
 
   onSelect(item){
     this.evidenceService.resetCounters();
-    this.evidenceService.wordCounts(this.getQueryUrl(item.link));
+    this.evidenceService.wordCounts(item.link);
   }
 
   buildCorpus() {
@@ -40,10 +41,5 @@ export class EvidenceComponent {
     this.corpusService.corpusBuilder(this.mainKeyword, this.supportKeywords);
   }
 
-  getQueryUrl (link) {
-    return "https://query.yahooapis.com/v1/public/yql?" +
-        "q=select * from html where url=\""+ link +"\" and "+
-        "xpath=\"//*[contains(@class,\'paragraph\')]|//p\"" +
-        "&format=json&diagnostics=true&callback=";
-  }
+
 }
