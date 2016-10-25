@@ -35,7 +35,7 @@ export class NotifierService {
     if(this.task != null)
       this.task.stop();
     var self = this;
-    this.task = this.cron.schedule('*/15 * * * *', function () {
+    this.task = this.cron.schedule('*/20 * * * *', function () {
         self.removeOldNews();
         self.collectRateNotify(notifier, threshold);
       });
@@ -81,7 +81,7 @@ export class NotifierService {
     var self = this;
     var notifier =
       this.angularFire.database.object('/Notifier/rated-news', {preserveSnapshot: true});
-
+    console.log("in duplicate check");
     notifier.subscribe(snapshot => {
       if (snapshot.exists()) {
         //object exists
@@ -90,6 +90,7 @@ export class NotifierService {
             snapshots.forEach(
               function (snapshot) {
                 self.duplicate = snapshot.child("title").val() == newsTitle;
+
               })
           });
       } else {

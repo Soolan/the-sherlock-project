@@ -2,6 +2,7 @@ import {Injectable} from "@angular/core";
 import forEach = require("core-js/fn/array/for-each");
 import {Response, Http} from "@angular/http";
 import {Observable} from "rxjs";
+import {AngularFire} from "angularfire2";
 
 @Injectable()
 export class EvidenceService {
@@ -10,8 +11,9 @@ export class EvidenceService {
   private words;
   private normFactor;
   private corpus;
-  constructor (http: Http) {
+  constructor (http: Http, af:AngularFire) {
     this.http = http;
+    this.corpus = af.database.list('Evidence/Corpus/current-tree');
   }
 
   wordCounts(url) {
@@ -30,11 +32,13 @@ export class EvidenceService {
     this.words = null;
     this.normFactor = null;
   }
+
   calculateTFIDF (word) {
     // log((# of docs in the corpus)/(1+# of docs contain a specific word))
-    var corpusSize   = 1000; //this.corpus.length;
-    var docsWithWord = 55; //getDocsWith(word).length;
-    return Math.log2(corpusSize/(1+docsWithWord));
+    var corpusSize   = this.getCorpusSize(this.corpus);
+    var docsWithWord = this.countDocsWith(word);
+    console.log('calculations:', corpusSize, docsWithWord);
+    return 10;// Math.log2(corpusSize/(1+docsWithWord));
   }
 
   calculateNorm (rawWords) {
@@ -90,7 +94,7 @@ export class EvidenceService {
   sortWords (instances) {
     var self = this;
     var words = [];
-    console.log(words);
+    // console.log(words);
     var sortedWords = Object.keys(instances).sort(
       function(a,b){
         return instances[b]-instances[a]
@@ -98,7 +102,7 @@ export class EvidenceService {
     sortedWords.forEach(function (word) {
       words.push({key:word, value:instances[word], tfidf:self.calculateTFIDF(word)});
     });
-    console.log(words);
+    // console.log(words);
 
     return words;
   }
@@ -108,5 +112,23 @@ export class EvidenceService {
       "q=select * from html where url=\""+ link +"\" and "+
       "xpath=\"//*[contains(@class,\'paragraph\')]|//p\"" +
       "&format=json&diagnostics=true&callback=";
+  }
+
+  countDocsWith(word) {
+    var count = 0;
+      this.corpus.subscribe(
+        data => { data.forEach((item: any) => {
+          if (item.article.indexOf(word) >= 0)
+            count++;
+        })}
+      );
+    return count;
+  }
+
+  getCorpusSize(corpus) {
+    corpus._ref.once("value")
+      .then(snapshots => {
+        return snapshots.numChildren();
+      });
   }
 }

@@ -8,15 +8,16 @@ import {googleSearchConfig} from "../app.module";
 @Injectable()
 export class CorpusService {
   private http;
+  private corpusSize = 0;
   private angularFire;
   private evidenceService;
   private timespans = [
-    {"span": "d1", "sort": "date:d"}
-    /*  {"span":"w1", "sort":"date:a"},
-     {"span":"m1", "sort":"date:a"},
-     {"span":"m3", "sort":"date:a"},
-     {"span":"y1", "sort":"date:a"},
-     {"span":"y10","sort":"date:a"}*/
+    {"span":"d1", "sort":"date:d"},
+    {"span":"w1", "sort":"date:a"},
+    {"span":"m1", "sort":"date:a"},
+    {"span":"m3", "sort":"date:a"},
+    {"span":"y1", "sort":"date:a"},
+    {"span":"y10","sort":"date:a"}
   ];
 
   constructor(http: Http, af: AngularFire, es: EvidenceService) {
@@ -53,8 +54,8 @@ export class CorpusService {
     var self = this;
     // remove previous corpus
     this.angularFire.database.object('Evidence/Corpus/').remove();
-    var links = this.angularFire.database.list('Evidence/Corpus/links');
-    var articles = this.angularFire.database.list('Evidence/Corpus/articles');
+    // var links = this.angularFire.database.list('Evidence/Corpus/links');
+    // var articles = this.angularFire.database.list('Evidence/Corpus/articles');
     var evidence = this.angularFire.database.list('Evidence/Corpus/current-tree');
 
     this.timespans.forEach( function (period) {
@@ -68,11 +69,13 @@ export class CorpusService {
               .getArticle(url)
               .subscribe(
                 data => {
+                  self.evidenceService.article = '';
                   self.evidenceService.findInKey(data, 'content');
                   evidence.push({
                     'link':item.link,
                     'article': self.evidenceService.article
-                  })
+                  });
+                  self.corpusSize ++;
                 });
           })
         );
@@ -99,11 +102,9 @@ export class CorpusService {
   // }
 
   getQueryUrl (keyword, range) {
-    var url= "https://www.googleapis.com/customsearch/v1?key="+googleSearchConfig.apiKey+
-      "&q="+keyword+"&cx="+googleSearchConfig.cx+"&num=2"+
-      "&sort="+range.sort+"&dateRestrict="+range.span;
-    // console.log("url:", url);
-    return url;
+    return "https://www.googleapis.com/customsearch/v1?"+
+      "key="+googleSearchConfig.apiKey+"&cx="+googleSearchConfig.cx+
+      "&q="+keyword+"&sort="+range.sort+"&dateRestrict="+range.span;
   }
 
   getSearchResults(url) {

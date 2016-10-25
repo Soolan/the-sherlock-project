@@ -21,7 +21,7 @@ export class RatingLogic {
         for (var i=0; i<count; i++)
           trends.push({'keyword':data[i], 'rank': count-i});
       });
-    //this.trends = trends;
+    this.trends = trends;
     return trends;
   }
 
