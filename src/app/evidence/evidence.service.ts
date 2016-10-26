@@ -10,10 +10,16 @@ export class EvidenceService {
   private article='';
   private words;
   private normFactor;
+  private total=0;
   private corpus;
+  private corpusTree;
+  private corpusSize = 0;
+  private docsWithWord = 0;
   constructor (http: Http, af:AngularFire) {
     this.http = http;
-    this.corpus = af.database.list('Evidence/Corpus/current-tree');
+    this.corpus = af.database.object('Evidence/Corpus/summary');
+    this.corpusTree = af.database.list('Evidence/Corpus/current-tree');
+    this.getCorpusSize(this.corpus);
   }
 
   wordCounts(url) {
@@ -33,21 +39,15 @@ export class EvidenceService {
     this.normFactor = null;
   }
 
-  calculateTFIDF (word) {
-    // log((# of docs in the corpus)/(1+# of docs contain a specific word))
-    var corpusSize   = this.getCorpusSize(this.corpus);
-    var docsWithWord = this.countDocsWith(word);
-    console.log('calculations:', corpusSize, docsWithWord);
-    return 10;// Math.log2(corpusSize/(1+docsWithWord));
-  }
-
   calculateNorm (rawWords) {
     // Norm factor = Square Root of (Sum of(each word value power 2));
-    var total = 0;
-    rawWords.forEach(function (w) {
-      total += w.value * w.value;
-    });
-    return Math.sqrt(total);
+    // var total = 0;
+    // rawWords.forEach(function (w) {
+    //   total += w.value * w.value;
+    //   console.log(total);
+    // });
+    // console.log(this.total);
+    return Math.sqrt(this.total);
   }
 
   findInKey(object, myKey) {
@@ -94,16 +94,20 @@ export class EvidenceService {
   sortWords (instances) {
     var self = this;
     var words = [];
-    // console.log(words);
     var sortedWords = Object.keys(instances).sort(
       function(a,b){
-        return instances[b]-instances[a]
+        return instances[a]-instances[b]
       });
     sortedWords.forEach(function (word) {
-      words.push({key:word, value:instances[word], tfidf:self.calculateTFIDF(word)});
-    });
-    // console.log(words);
+      // console.log(word, instances[word]);
+      self.total += instances[word] * instances[word];
+      self.calculateTFIDF(word).then(data =>
+        words.push({
+          key:word, value:instances[word], tfidf:data
+        })
+      );
 
+    });
     return words;
   }
 
@@ -114,21 +118,37 @@ export class EvidenceService {
       "&format=json&diagnostics=true&callback=";
   }
 
-  countDocsWith(word) {
-    var count = 0;
-      this.corpus.subscribe(
-        data => { data.forEach((item: any) => {
-          if (item.article.indexOf(word) >= 0)
-            count++;
-        })}
+  calculateTFIDF (word) {
+    return this.countDocsWith(word)
+      .then(
+        data => Math.log2(this.corpusSize/(1+data))
       );
-    return count;
+  }
+
+  countDocsWith(word) {
+    var self = this;
+    var count = 0;
+    return this.corpusTree._ref.once("value")
+        .then(
+          function (snapshot) {
+            snapshot.forEach((item: any) => {
+              if (item.child('article').val().indexOf(word) >= 0) {
+                count ++;
+              }
+            });
+            // console.log('docs with word: '+word, self.docsWithWord);
+            return count;
+        }
+      );
   }
 
   getCorpusSize(corpus) {
+    var self = this;
     corpus._ref.once("value")
-      .then(snapshots => {
-        return snapshots.numChildren();
-      });
+      .then(
+        function (snapshot) {
+          self.corpusSize = snapshot.child('corpus-size').val();
+        }
+      );
   }
 }

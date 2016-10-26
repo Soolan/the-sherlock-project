@@ -1,6 +1,6 @@
 import {Injectable} from "@angular/core";
 import {Http, Response} from "@angular/http";
-import {AngularFire, FirebaseListObservable, FirebaseObjectObservable} from "angularfire2";
+import {AngularFire} from "angularfire2";
 import {EvidenceService} from "./evidence.service";
 import {Observable} from "rxjs";
 import {googleSearchConfig} from "../app.module";
@@ -79,7 +79,9 @@ export class CorpusService {
                 });
           })
         );
-    })
+    });
+    this.angularFire.database.object('Evidence/Corpus')
+      .set({'summary': {'corpus-size':this.corpusSize}});
   }
 
   // addArticlesToCorpus(evidenceService) {
