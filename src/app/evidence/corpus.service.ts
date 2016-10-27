@@ -71,11 +71,14 @@ export class CorpusService {
                 data => {
                   self.evidenceService.article = '';
                   self.evidenceService.findInKey(data, 'content');
-                  evidence.push({
-                    'link':item.link,
-                    'article': self.evidenceService.article
-                  });
-                  self.corpusSize ++;
+                  if (self.evidenceService.article != null && self.evidenceService.article.length > 50) {
+                    evidence.push({
+                      'link':item.link,
+                      'article': self.evidenceService.article
+                    });
+                    self.corpusSize ++;
+                    console.log(self.corpusSize);
+                  }
                 });
           })
         );

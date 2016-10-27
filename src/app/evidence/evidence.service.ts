@@ -101,12 +101,14 @@ export class EvidenceService {
     sortedWords.forEach(function (word) {
       // console.log(word, instances[word]);
       self.total += instances[word] * instances[word];
-      self.calculateTFIDF(word).then(data =>
+      self.calculateIDF(word).then(data =>
         words.push({
-          key:word, value:instances[word], tfidf:data
+          key:word, value:instances[word],
+          idf:parseFloat(data).toFixed(5),
+          tfidf:((instances[word]/self.normFactor)*data).toFixed(5),
+          tfidf2:(instances[word]*data).toFixed(5)
         })
-      );
-
+      )
     });
     return words;
   }
@@ -118,10 +120,11 @@ export class EvidenceService {
       "&format=json&diagnostics=true&callback=";
   }
 
-  calculateTFIDF (word) {
+  calculateIDF (word) {
     return this.countDocsWith(word)
       .then(
-        data => Math.log2(this.corpusSize/(1+data))
+        data =>
+          Math.log2(this.corpusSize / (1 + data))
       );
   }
 

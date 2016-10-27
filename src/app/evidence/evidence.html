@@ -51,8 +51,10 @@
             <th>#</th>
             <th>Words</th>
             <th>Counts</th>
-            <th>Normalized Value</th>
-            <th>TF-IDF factor</th>
+            <th>Normalized</th>
+            <th>IDF factor</th>
+            <th>TFIDF factor</th>
+            <th>TFIDF 2</th>
           </tr>
           </thead>
           <tbody *ngFor="let word of evidenceService.words; let i=index">
@@ -60,8 +62,10 @@
             <th>{{i+1}}</th>
             <td>{{word.key}}</td>
             <td>{{word.value}}</td>
-            <td>{{word.value/evidenceService.normFactor}}</td>
+            <td>{{word.value/evidenceService.normFactor|number : '1.5-5'}}</td>
+            <td>{{word.idf}}</td>
             <td>{{word.tfidf}}</td>
+            <td>{{word.tfidf2}}</td>
           </tr>
           </tbody>
         </table>
