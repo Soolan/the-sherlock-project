@@ -10,27 +10,46 @@ export class EvidenceService {
   private article='';
   private words;
   private normFactor;
-  private total=0;
   private corpus;
   private corpusTree;
-  private corpusSize = 0;
-  private docsWithWord = 0;
+  private corpusSize = 100;
   constructor (http: Http, af:AngularFire) {
     this.http = http;
     this.corpus = af.database.object('Evidence/Corpus/summary');
     this.corpusTree = af.database.list('Evidence/Corpus/current-tree');
-    this.getCorpusSize(this.corpus);
   }
 
   wordCounts(url) {
-    //this.resetCounters();
     this.getArticle(this.getQueryUrl(url))
       .subscribe(
         data => {
           this.findInKey(data, 'content');
-          this.words= this.countInstances(this.extractWords(this.article));
-          this.normFactor = this.calculateNorm(this.words);
+          this.words= this.evaluateWords(
+            this.countInstances(
+              this.extractWords(this.article)
+            )
+          );
         });
+  }
+
+  evaluateWords(instances) {
+    var self = this;
+    var words = [];
+    var normFactor = this.calculateNorm(instances);
+    instances.forEach(function (word) {
+      var normalized = instances[word]/normFactor;
+      self.calculateIDF(word).then(data => {
+        console.log(data);
+        words.push({
+          key:word, value:instances[word],
+          idf:parseFloat(data).toFixed(5),
+          normalized:normalized,
+          tfidf_N:(normalized*data).toFixed(5),
+          tfidf_C:(instances[word]*data).toFixed(5)
+        })
+      })
+    });
+    return words;
   }
 
   resetCounters() {
@@ -41,22 +60,26 @@ export class EvidenceService {
 
   calculateNorm (rawWords) {
     // Norm factor = Square Root of (Sum of(each word value power 2));
-    // var total = 0;
-    // rawWords.forEach(function (w) {
-    //   total += w.value * w.value;
-    //   console.log(total);
-    // });
-    // console.log(this.total);
-    return Math.sqrt(this.total);
+    var total = 0;
+    console.log(rawWords);
+    rawWords.forEach(function (w) {
+      total += w.value * w.value;
+
+    });
+    return Math.sqrt(total);
   }
 
-  findInKey(object, myKey) {
+  findInKey(object, string) {
     for (var key in object) {
-      // console.log(!!object[key])
       if (object[key] && typeof(object[key])=="object") {
-        this.findInKey(object[key], myKey );
-      } else if (key == myKey || typeof (key) == "string" && key != 'class' && key != 'id' && key != 'href') {
-        // console.log(object[key]);
+        this.findInKey(object[key], string );
+      } else if (
+        key == string ||
+        typeof (key) == "string" &&
+        key != 'class' &&
+        key != 'id' &&
+        key != 'href'
+      ) {
         this.article += object[key];
       }
     }
@@ -87,30 +110,16 @@ export class EvidenceService {
         instances[word] = 1;
       }
     });
+    // console.log('instances:', instances);
     return this.sortWords(instances);
   }
 
   // sort the words and save them as an array of objects
   sortWords (instances) {
-    var self = this;
-    var words = [];
-    var sortedWords = Object.keys(instances).sort(
-      function(a,b){
-        return instances[a]-instances[b]
-      });
-    sortedWords.forEach(function (word) {
-      // console.log(word, instances[word]);
-      self.total += instances[word] * instances[word];
-      self.calculateIDF(word).then(data =>
-        words.push({
-          key:word, value:instances[word],
-          idf:parseFloat(data).toFixed(5),
-          tfidf:((instances[word]/self.normFactor)*data).toFixed(5),
-          tfidf2:(instances[word]*data).toFixed(5)
-        })
-      )
+    Object.keys(instances).sort(function(a,b) {
+        return instances[b]-instances[a]
     });
-    return words;
+    console.log('sortwords:', instances);
   }
 
   getQueryUrl (link) {
@@ -121,10 +130,18 @@ export class EvidenceService {
   }
 
   calculateIDF (word) {
+    // ToDo: before calculation check if it is done before
+    // look into Evidence/Corpus/IDFs and look for {word:'', idf:''} if it exists return
+    // else
     return this.countDocsWith(word)
       .then(
-        data =>
-          Math.log2(this.corpusSize / (1 + data))
+        data => {
+          console.log('#docs, size, idf:',
+            data, this.corpusSize, Math.log2(this.corpusSize / (1 + data))
+          );
+          // console.log('calculateIDF:', Math.log2(this.corpusSize / (1 + data)));
+          Math.log2(this.corpusSize / (1 + data));
+        }
       );
   }
 
@@ -135,12 +152,12 @@ export class EvidenceService {
         .then(
           function (snapshot) {
             snapshot.forEach((item: any) => {
-              if (item.child('article').val().indexOf(word) >= 0) {
+              if (item.child('article').val().indexOf(word) > 0) {
                 count ++;
               }
             });
             // console.log('docs with word: '+word, self.docsWithWord);
-            return count;
+            return 65;//count;
         }
       );
   }

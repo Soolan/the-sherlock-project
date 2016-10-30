@@ -2,7 +2,7 @@ import {Component} from '@angular/core';
 import {EvidenceService} from "./evidence.service";
 import {AngularFire} from "angularfire2";
 import {CorpusService} from "./corpus.service";
-import {supportsState} from "@angular/platform-browser/src/browser/location/history";
+import {ClusteringService} from "./clustering.service";
 
 @Component({
   selector: 'sh-evidence',
@@ -15,10 +15,16 @@ export class EvidenceComponent {
   private newsItems;
   private supportKeywords;
   private mainKeyword;
+  private clusterKeywords;
+  private clusteringService;
 
-  constructor (es:EvidenceService, af: AngularFire, private cs: CorpusService) {
-    this.evidenceService = es;
-    this.corpusService   = cs;
+  constructor (
+    es:EvidenceService, af: AngularFire, cs: CorpusService,
+    cls: ClusteringService
+  ) {
+    this.evidenceService   = es;
+    this.corpusService     = cs;
+    this.clusteringService = cls;
     af.database.list('/Notifier/rated-news', {
       query: {
         orderByChild: 'rank',
@@ -41,5 +47,9 @@ export class EvidenceComponent {
     this.corpusService.corpusBuilder(this.mainKeyword, this.supportKeywords);
   }
 
-
+  buildClusters() {
+    // ToDo: build the corpus
+    // Fetch news for the main
+    this.clusteringService.clusterBuilder(this.clusterKeywords);
+  }
 }
