@@ -113,7 +113,7 @@ export class EvidenceService {
         instances[word] = 1;
       }
     });
-    // console.log('instances:', instances);
+    console.log('instances:', instances);
     return this.sortWords(instances);
   }
 
@@ -122,6 +122,7 @@ export class EvidenceService {
     var sorted = Object.keys(instances).sort(function(a,b) {
         return instances[b]-instances[a]
     });
+    // console.log(sorted);
     return sorted;
   }
 
