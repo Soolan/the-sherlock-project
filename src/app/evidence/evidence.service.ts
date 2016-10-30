@@ -13,6 +13,7 @@ export class EvidenceService {
   private corpus;
   private corpusTree;
   private corpusSize = 100;
+
   constructor (http: Http, af:AngularFire) {
     this.http = http;
     this.corpus = af.database.object('Evidence/Corpus/summary');
@@ -38,8 +39,9 @@ export class EvidenceService {
     var normFactor = this.calculateNorm(instances);
     instances.forEach(function (word) {
       var normalized = instances[word]/normFactor;
+      // console.log(normalized, instances[word], normFactor);
+
       self.calculateIDF(word).then(data => {
-        console.log(data);
         words.push({
           key:word, value:instances[word],
           idf:parseFloat(data).toFixed(5),
@@ -61,11 +63,12 @@ export class EvidenceService {
   calculateNorm (rawWords) {
     // Norm factor = Square Root of (Sum of(each word value power 2));
     var total = 0;
-    console.log(rawWords);
     rawWords.forEach(function (w) {
-      total += w.value * w.value;
+      console.log('total, word count:', total, w.value );
 
+      total += w.value * w.value;
     });
+    console.log(total);
     return Math.sqrt(total);
   }
 
@@ -116,10 +119,10 @@ export class EvidenceService {
 
   // sort the words and save them as an array of objects
   sortWords (instances) {
-    Object.keys(instances).sort(function(a,b) {
+    var sorted = Object.keys(instances).sort(function(a,b) {
         return instances[b]-instances[a]
     });
-    console.log('sortwords:', instances);
+    return sorted;
   }
 
   getQueryUrl (link) {
@@ -140,7 +143,7 @@ export class EvidenceService {
             data, this.corpusSize, Math.log2(this.corpusSize / (1 + data))
           );
           // console.log('calculateIDF:', Math.log2(this.corpusSize / (1 + data)));
-          Math.log2(this.corpusSize / (1 + data));
+          return Math.log2(this.corpusSize / (1 + data));
         }
       );
   }
