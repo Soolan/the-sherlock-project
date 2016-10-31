@@ -9,7 +9,6 @@ export class EvidenceService {
   private http;
   private article='';
   private words;
-  private normFactor;
   private corpus;
   private corpusTree;
   private corpusSize = 100;
@@ -20,15 +19,13 @@ export class EvidenceService {
     this.corpusTree = af.database.list('Evidence/Corpus/current-tree');
   }
 
-  wordCounts(url) {
+  wordAnalyzer(url) {
     this.getArticle(this.getQueryUrl(url))
       .subscribe(
         data => {
           this.findInKey(data, 'content');
           this.words= this.evaluateWords(
-            this.countInstances(
-              this.extractWords(this.article)
-            )
+            this.countInstances(this.extractWords(this.article))
           );
         });
   }
@@ -37,17 +34,16 @@ export class EvidenceService {
     var self = this;
     var words = [];
     var normFactor = this.calculateNorm(instances);
-    instances.forEach(function (word) {
-      var normalized = instances[word]/normFactor;
-      // console.log(normalized, instances[word], normFactor);
-
-      self.calculateIDF(word).then(data => {
+    instances.forEach(function (w) {
+      var normalized = w.count/normFactor;
+      self.calculateIDF(w).then(data => {
         words.push({
-          key:word, value:instances[word],
+          word:w.word,
+          count:w.count,
           idf:parseFloat(data).toFixed(5),
-          normalized:normalized,
+          normalized:normalized.toFixed(5),
           tfidf_N:(normalized*data).toFixed(5),
-          tfidf_C:(instances[word]*data).toFixed(5)
+          tfidf_C:(w.count*data).toFixed(5)
         })
       })
     });
@@ -57,16 +53,13 @@ export class EvidenceService {
   resetCounters() {
     this.article = null;
     this.words = null;
-    this.normFactor = null;
   }
 
   calculateNorm (rawWords) {
     // Norm factor = Square Root of (Sum of(each word value power 2));
     var total = 0;
     rawWords.forEach(function (w) {
-      console.log('total, word count:', total, w.value );
-
-      total += w.value * w.value;
+      total += w.count * w.count;
     });
     console.log(total);
     return Math.sqrt(total);
@@ -113,17 +106,19 @@ export class EvidenceService {
         instances[word] = 1;
       }
     });
-    console.log('instances:', instances);
     return this.sortWords(instances);
   }
 
   // sort the words and save them as an array of objects
   sortWords (instances) {
-    var sorted = Object.keys(instances).sort(function(a,b) {
-        return instances[b]-instances[a]
+    var words = [];
+    var sortedWords = Object.keys(instances).sort(function(a,b) {
+        return instances[a]-instances[b]
     });
-    // console.log(sorted);
-    return sorted;
+    sortedWords.forEach(function (word) {
+      words.push({word:word, count:instances[word]});
+    });
+    return words;
   }
 
   getQueryUrl (link) {
@@ -140,10 +135,6 @@ export class EvidenceService {
     return this.countDocsWith(word)
       .then(
         data => {
-          console.log('#docs, size, idf:',
-            data, this.corpusSize, Math.log2(this.corpusSize / (1 + data))
-          );
-          // console.log('calculateIDF:', Math.log2(this.corpusSize / (1 + data)));
           return Math.log2(this.corpusSize / (1 + data));
         }
       );

@@ -6,17 +6,30 @@
       <ul class="list-unstyled">
         <li *ngFor="let item of newsItems">
           <div class="media-right">
-            <input type="radio" name="news" (click)="onSelect(item)">
+            <input type="radio" name="news" (click)="onSelect(item, true)">
             {{item.title}} <a href="{{item.link}}">(read more)</a> <br>
           </div>
         </li>
       </ul>
       <div class="input-group">
-        <input type="text" class="form-control" placeholder="other news/article url...">
+        <input type="text" class="form-control" #url placeholder="other news/article url...">
         <span class="input-group-btn">
-          <button class="btn btn-default" type="button">Go!</button>
+          <button class="btn btn-default" type="button" (click)="onSelect(url.value, false)">Go!</button>
         </span>
       </div><!-- /input-group -->
+    </div>
+    <div class="panel panel-default ">
+      <!-- Default panel contents -->
+      <div class="panel-heading">Nominated keywords for corpus</div>
+      <input type="text" [(ngModel)]="supportKeywords" class="form-control" placeholder="Comma separated support keywords">
+      <input type="text" [(ngModel)]="mainKeyword" class="form-control" placeholder="Keyword of interest">
+      <button type="submit" (click)="buildCorpus()" class="btn btn-default btn-block">Fetch Articles For Corpus</button>
+    </div>
+    <div class="panel panel-default ">
+      <!-- Default panel contents -->
+      <div class="panel-heading">Nominated keywords for cluster centers</div>
+      <input type="text" [(ngModel)]="clusterKeywords" class="form-control" placeholder="Comma separated cluster keywords">
+      <button type="submit" (click)="buildClusters()" class="btn btn-default btn-block">Build Clusters</button>
     </div>
     <div class="panel panel-default ">
       <!-- Default panel contents -->
@@ -25,21 +38,8 @@
         {{evidenceService.article}}
       </p>
     </div>
-    <div class="panel panel-default ">
-      <!-- Default panel contents -->
-      <div class="panel-heading">Nominated Keywords</div>
-      <input type="text" [(ngModel)]="supportKeywords" class="form-control" placeholder="Comma separated support keywords">
-      <input type="text" [(ngModel)]="mainKeyword" class="form-control" placeholder="Keyword of interest">
-      <button type="submit" (click)="buildCorpus()" class="btn btn-default btn-block">Fetch Articles For Corpus</button>
-    </div>
   </div>
   <div class="col-md-7">
-    <div class="panel panel-default ">
-      <!-- Default panel contents -->
-      <div class="panel-heading">Nominated Keywords for cluster centers</div>
-      <input type="text" [(ngModel)]="clusterKeywords" class="form-control" placeholder="Comma separated cluster keywords">
-      <button type="submit" (click)="buildClusters()" class="btn btn-default btn-block">Build Clusters</button>
-    </div>
     <div class="panel panel-default ">
       <!-- Default panel contents -->
       <div class="panel-heading">Processed words</div>
@@ -56,15 +56,15 @@
           <th>TFIDF(N)</th>
         </tr>
         </thead>
-        <tbody *ngFor="let word of evidenceService.words; let i=index">
+        <tbody *ngFor="let w of evidenceService.words; let i=index">
         <tr>
           <th>{{i+1}}</th>
-          <td>{{word.key}}</td>
-          <td>{{word.value}}</td>
-          <td>{{word.normalized}}</td>
-          <td>{{word.idf}}</td>
-          <td>{{word.tfidf_C}}</td>
-          <td>{{word.tfidf_N}}</td>
+          <td>{{w.word}}</td>
+          <td>{{w.count}}</td>
+          <td>{{w.normalized}}</td>
+          <td>{{w.idf}}</td>
+          <td>{{w.tfidf_C}}</td>
+          <td>{{w.tfidf_N}}</td>
 
         </tr>
         </tbody>

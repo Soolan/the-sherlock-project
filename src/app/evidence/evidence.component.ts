@@ -36,9 +36,11 @@ export class EvidenceComponent {
       );
   }
 
-  onSelect(item){
+  onSelect(item, isRadio){
     this.evidenceService.resetCounters();
-    this.evidenceService.wordCounts(item.link);
+    var url = isRadio?item.link:item;
+    console.log(item, item.link, url);
+    this.evidenceService.wordAnalyzer(url);
   }
 
   buildCorpus() {
