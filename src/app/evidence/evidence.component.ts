@@ -1,8 +1,6 @@
 import {Component} from '@angular/core';
 import {EvidenceService} from "./evidence.service";
 import {AngularFire} from "angularfire2";
-import {CorpusService} from "./corpus.service";
-import {ClusteringService} from "./clustering.service";
 
 @Component({
   selector: 'sh-evidence',
@@ -11,20 +9,13 @@ import {ClusteringService} from "./clustering.service";
 })
 export class EvidenceComponent {
   private evidenceService;
-  private corpusService;
   private newsItems;
   private supportKeywords;
   private mainKeyword;
   private clusterKeywords;
-  private clusteringService;
 
-  constructor (
-    es:EvidenceService, af: AngularFire, cs: CorpusService,
-    cls: ClusteringService
-  ) {
+  constructor (es:EvidenceService, af: AngularFire) {
     this.evidenceService   = es;
-    this.corpusService     = cs;
-    this.clusteringService = cls;
     af.database.list('/Notifier/rated-news', {
       query: {
         orderByChild: 'rank',
@@ -37,7 +28,6 @@ export class EvidenceComponent {
   }
 
   onSelect(item, isRadio){
-    this.evidenceService.resetCounters();
     var url = isRadio?item.link:item;
     console.log(item, item.link, url);
     this.evidenceService.wordAnalyzer(url);
@@ -46,12 +36,13 @@ export class EvidenceComponent {
   buildCorpus() {
     // ToDo: build the corpus
     // Fetch news for the main
-    this.corpusService.corpusBuilder(this.mainKeyword, this.supportKeywords);
+
+    this.evidenceService.corpusBuilder(this.mainKeyword, this.supportKeywords);
   }
 
   buildClusters() {
-    // ToDo: build the corpus
-    // Fetch news for the main
-    this.clusteringService.clusterBuilder(this.clusterKeywords);
+  //   // ToDo: build the corpus
+  //   // Fetch news for the main
+  //   this.evidenceService.clusterBuilder(this.clusterKeywords);
   }
 }

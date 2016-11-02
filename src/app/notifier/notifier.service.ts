@@ -90,7 +90,6 @@ export class NotifierService {
             snapshots.forEach(
               function (snapshot) {
                 self.duplicate = snapshot.child("title").val() == newsTitle;
-
               })
           });
       } else {

@@ -20,8 +20,6 @@ import {EvidenceComponent} from "./evidence/evidence.component";
 import {EvidenceService} from "./evidence/evidence.service";
 import {BusyModule} from 'angular2-busy';
 import {AiComponent} from './ai/ai.component';
-import {CorpusService} from "./evidence/corpus.service";
-import {ClusteringService} from "./evidence/clustering.service";
 
 export const firebaseConfig = {
   apiKey: "AIzaSyA8C9a7wZ9r-5BsMXJbP3-6_raliTVkHpk",
@@ -39,6 +37,15 @@ export const googleSearchConfig = {
   cx    : '001410267427255255168:nfviboevhri'
 };
 
+export const timeSpans = [
+  {"span": "d1", "sort": "date:d"} //,
+  // {"span":"w1", "sort":"date:a"},
+  // {"span":"m1", "sort":"date:a"},
+  // {"span":"m3", "sort":"date:a"},
+  // {"span":"y1", "sort":"date:a"},
+  // {"span":"y10","sort":"date:a"}
+];
+
 @NgModule({
   declarations: [
     AppComponent, NavigationComponent, CollectorComponent,
@@ -55,7 +62,7 @@ export const googleSearchConfig = {
   providers   : [
     {provide: LocationStrategy, useClass: HashLocationStrategy},
     CollectorService, RatingService, RatingLogic, NotifierService,
-    EvidenceService, CorpusService, ClusteringService
+    EvidenceService
   ],
   bootstrap   : [AppComponent]
 })
