@@ -29,7 +29,6 @@ export class EvidenceComponent {
 
   onSelect(item, isRadio){
     var url = isRadio?item.link:item;
-    console.log(item, item.link, url);
     this.evidenceService.wordAnalyzer(url);
   }
 

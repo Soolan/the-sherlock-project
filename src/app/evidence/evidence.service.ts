@@ -4,6 +4,7 @@ import {Response, Http} from "@angular/http";
 import {Observable} from "rxjs";
 import {AngularFire, FirebaseListObservable} from "angularfire2";
 import {googleSearchConfig, timeSpans} from "../app.module";
+
 @Injectable()
 export class EvidenceService {
   private http;
@@ -11,25 +12,27 @@ export class EvidenceService {
   private words;
   private corpusSize;
   private angularFire;
-  private IDFs = [];
+  // private IDFs = [];
   private corpus: FirebaseListObservable <any>;
+  private IDFs: FirebaseListObservable <any>;
 
   constructor (http: Http, af:AngularFire) {
     this.http = http;
     this.angularFire = af;
-    this.corpus = af.database.list('Evidence/Corpus/articles');
+    this.corpus = af.database.list('Evidence/Corpus/Articles');
+    this.IDFs   = af.database.list('Evidence/Corpus/IDFs');
   }
 
   wordAnalyzer(url) {
-    this.resetCounters();
     return this.getArticle(this.getYahooQueryUrl(url))
       .subscribe(
         data => {
+          this.resetCounters();
           this.findInKey(data, 'content');
-          this.words= this.evaluateWords(
-            this.countInstances(this.extractWords(this.article))
-          );
-          return this.article;
+          if(this.article)
+            this.words = this.evaluateWords(
+              this.countInstances(this.extractWords(this.article))
+            );
         });
   }
 
@@ -47,9 +50,17 @@ export class EvidenceService {
           normalized:normalized.toFixed(5),
           tfidf_C:(w.count*data).toFixed(5),
           tfidf_N:(normalized*data).toFixed(5)
-        })
-      })
+        });
+        if(words.length == instances.length)
+          self.corpus.push({article: self.article, summary: words})
+      });
     });
+
+    // new Promise(function(resolve, reject) {
+    //   resolve(words)
+    // }).then( words => {
+    //   this.corpus.push({article: this.article, summary: words})
+    // });
     return words;
   }
 
@@ -130,35 +141,79 @@ export class EvidenceService {
       "&format=json&diagnostics=true&callback=";
   }
 
-  calculateIDF (word) {
-    var idf = this.isIDFExist (word, this.IDFs);
-    if(idf){
-      console.log('idf exists: ', idf);
-      return new Promise(function(resolve, reject) {
-        resolve(idf);
-      });
-    } else {
-      return this.countDocsWith(word)
-        .then(data => {
-          idf = Math.log2(
-            (this.corpusSize == 0)?1:this.corpusSize / (1 + data)
-          );
-          console.log('corpus size: ', this.corpusSize,
-            'docs with word: '+data, 'w: '+word.word,'idf: '+idf);
+  // calculateIDF (word) {
+  //   var idf = this.isIDFExist (word, this.IDFs);
+  //   if(idf){
+  //     return new Promise(function(resolve, reject) {
+  //       resolve(idf);
+  //     });
+  //   } else {
+  //     return this.countDocsWith(word)
+  //       .then(data => {
+  //         idf = Math.log2(
+  //           (this.corpusSize == 0)?1:this.corpusSize / (1 + data)
+  //         );
+  //         this.IDFs.push({name:word.word, idf:idf});
+  //         return idf;
+  //       });
+  //   }
+  // }
 
-          this.IDFs.push({word:word.word, idf:idf});
-          console.log(this.IDFs);
-          return idf;
-        });
-    }
+  // isIDFExist(word, IDFs) {
+  //   return IDFs.forEach((idf: any) => {
+  //     if (idf.name === word) {
+  //       console.log(idf);
+  //       idf.idf ++;  // increase by one to cover the current document
+  //       console.log(idf);
+  //       return idf.idf;
+  //     }
+  //     else
+  //       return null;
+  //   });
+  // }
+
+  calculateIDF (word) {
+    return this.isIDFExist (word, this.IDFs)
+      .then(data => {
+        console.log('isIDFExist',data);
+        if(data!=0){
+          return new Promise(function(resolve, reject) {
+            resolve(data);
+          });
+        } else {
+          return this.countDocsWith(word)
+            .then(data => {
+              var idf = Math.log2(
+                (this.corpusSize == 0)?1:this.corpusSize / (1 + data)
+              );
+              this.IDFs.push({name:word.word, idf:idf});
+              return idf;
+            });
+        }
+      });
   }
 
   isIDFExist(word, IDFs) {
-    return IDFs.forEach((idf: any) => {
-      if (idf.word === word)
-        return idf.idf;
-      else
-        return null;
+    console.log("in duplicate check");
+    return IDFs._ref.once("value")
+      .then(snapshot => {
+      if (snapshot.exists()) {
+
+        snapshot.forEach((item: any) => {
+          if (item.child('name').val() == word.word) {
+            var newIdf = item.child('idf').val() + 1;
+            IDFs.update(item, {name: word.word, idf: newIdf});
+            console.log('idf : ', newIdf);
+            return newIdf;
+          }
+          else {
+            console.log('returns zero ');
+            return 0;
+          }
+        });
+      } else {
+        return 0;
+      }
     });
   }
 
@@ -206,8 +261,7 @@ export class EvidenceService {
       self.getSearchResults(self.getGoogleQueryUrl(keyword, period))
         .subscribe(data => data.forEach(function (item) {
             self.wordAnalyzer(item.link);
-            console.log('here', data);
-            self.corpus.push({article: self.article})
+       //     console.log('links:', data);
           })
         )
     });
@@ -216,7 +270,7 @@ export class EvidenceService {
   getGoogleQueryUrl(keyword, range) {
     return "https://www.googleapis.com/customsearch/v1?" +
       "key=" + googleSearchConfig.apiKey + "&cx=" + googleSearchConfig.cx +
-      "&q=" + keyword + "&sort=" + range.sort + "&dateRestrict=" + range.span;
+      "&q=" + keyword + "&sort=" + range.sort + "&dateRestrict=" + range.span ;
   }
 
   getSearchResults(url) {
