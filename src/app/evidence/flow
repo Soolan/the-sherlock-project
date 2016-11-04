@@ -1,0 +1,48 @@
+component:
+  constructor:
+    es: EvidenceService
+    af: AngularFire  # we query and get news from rated-news
+
+  onSelect:
+    input: url
+    method: es.WordAnalyzer(url)
+
+service:
+  constructor:
+    http: Http # call get request for yahoo and google queries
+    af: AngularFire # af.database.list('Evidence/Corpus/Articles')
+
+  wordAnalyzer:
+    input: url
+    method: getArticle
+      input: url # this.getYahooQueryUrl(url)
+      return: Observable # json response for html contents
+        subscribe: json contents
+          method: resetCounters() # nulls articles and words
+          method: findInKey
+            input: data, 'content' # look for content key in the json reposne
+            # saves the 'content' keys in the this.article
+          method: evaluateWords
+            input:
+              method: countInstances
+                input:
+                  method: extractWords
+                    input: this.article
+                    return: array # remove symbols and white spaces and return an array of words
+                return:
+                  method: sortWords
+                    input: array of objects # [{word:'', count:''}, ...]
+                    return: array of objects  # sorted word objects
+            method: calculateNorm
+              input: array of sorted word objects
+              return: number # norm factor
+            method: calculateIDF
+              input: object # {word:'', count:''}
+              return:
+                method: countDocsWith
+                  input: object # {word:'', count:''}
+                  return: promise # number (number of docs)
+                    then:
+                      return: number #idf
+            return: array # an array of words with their calculations
+    return: Observable
