@@ -17,8 +17,7 @@ export class EvidenceService implements OnInit{
   // private IDFs: FirebaseListObservable <any>;
 
   constructor (http: Http, af:AngularFire) {
-    console.log(this.words, this.article);
-
+    console.log(this.IDFs);
     this.http = http;
     this.angularFire = af;
     this.corpus = af.database.list('Evidence/Corpus/Articles');
@@ -27,14 +26,13 @@ export class EvidenceService implements OnInit{
   }
 
   ngOnInit(){
-    Observable.timer(100,2200).subscribe(this.wordAnalyzer);
-    Observable.timer(100,1000).subscribe(this.getArticle);
-    Observable.timer(100,800).subscribe(this.evaluateWords);
-    Observable.timer(100,300).subscribe(this.countInstances);
+    Observable.timer(100,1000).subscribe(this.wordAnalyzer);
+    Observable.timer(100,800).subscribe(this.getArticle);
+    Observable.timer(100,600).subscribe(this.evaluateWords);
+    Observable.timer(100,400).subscribe(this.countInstances);
   }
 
   wordAnalyzer(url) {
-    var self = this;
     return this.getArticle(this.getYahooQueryUrl(url))
       .subscribe(
         data => {
@@ -55,30 +53,41 @@ export class EvidenceService implements OnInit{
     var self = this;
     var words = [];
     var normFactor = this.calculateNorm(instances);
-
     Promise.all(
       instances.map( function (w) {
         if (w.word.length < 30) {
-          self.calculateIDF(w)
-            .then(data => {
-              self.words.push({
-                word: w.word,
-                count: w.count,
-                normalized: normalized.toFixed(5),
-                idf: parseFloat(data).toFixed(5),
-                tfidf_C: (w.count * data).toFixed(5),
-                tfidf_N: (normalized * data).toFixed(5)
-              });
-            });
-
-          var normalized = w.count / normFactor;
+          var normalized = w.count/normFactor;
           w['normalized']=normalized.toFixed(5);
+          // self.calculateIDF(w)
+          //   .then(data => {
+          //     self.words.push({
+          //       word: w.word,
+          //       count: w.count,
+          //       normalized: w.normalized,
+          //       idf: parseFloat(data).toFixed(5),
+          //       tfidf_C: (w.count * data).toFixed(5),
+          //       tfidf_N: (normalized * data).toFixed(5)
+          //     });
+          //   });
         }
         return w;
       })
     ).then(
       data => {
-        this.corpus.push({article:this.article, summary:data});
+        console.log('pushing');
+        this.corpus.push({article:this.article, bag_of_words:data});
+        var w = data;
+        self.calculateIDF(data)
+          .then(idf => {
+            self.words.push({
+              word: w.word,
+              count: w.count,
+              normalized: w.normalized,
+              idf: parseFloat(idf).toFixed(5),
+              tfidf_C: (w.count * idf).toFixed(5),
+              tfidf_N: (normalized * idf).toFixed(5)
+            });
+          });
       }
     );
   }
@@ -168,17 +177,19 @@ export class EvidenceService implements OnInit{
     var exists = false;
     return this.countDocsWith(word)
       .then(data => {
-        idf = Math.log2((this.corpusSize == 0)?1:this.corpusSize / (1 + data));
-        // console.log(
-        //   'idf:',idf,
-        //   '/ corpus size:', this.corpusSize,
-        //   '/ docs with word \"'+word.word+'\": ', data
-        // );
+        idf = Math.abs(Math.log2(
+          (this.corpusSize == 0)? 1:this.corpusSize/(data+1)
+        ));
+        console.log(
+          'idf:',idf,
+          '/ corpus size:', this.corpusSize,
+          '/ docs with word \"'+word.word+'\": ', data
+        );
 
         this.IDFs.some((item: any) => {
           if (item.name === word.word) {
             exists = true;
-            //console.log(item,'it was:',idf);
+            console.log(item,'it was:',idf);
             item.idf = idf;  // increase by one to cover the current document
             return exists;
           }
@@ -186,7 +197,7 @@ export class EvidenceService implements OnInit{
         if(!exists) {
           this.IDFs.push({name:word.word, idf:idf});
         }
-        // console.log('IDFs:', this.IDFs);
+        console.log('IDFs:', this.IDFs);
         return idf;
       });
   }
