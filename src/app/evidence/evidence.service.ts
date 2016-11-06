@@ -1,4 +1,4 @@
-import {Injectable} from "@angular/core";
+import {Injectable, OnInit} from "@angular/core";
 import forEach = require("core-js/fn/array/for-each");
 import {Response, Http} from "@angular/http";
 import {Observable} from "rxjs";
@@ -6,36 +6,47 @@ import {AngularFire, FirebaseListObservable} from "angularfire2";
 import {googleSearchConfig, timeSpans} from "../app.module";
 
 @Injectable()
-export class EvidenceService {
+export class EvidenceService implements OnInit{
   private http;
   private article='';
-  private words;
+  private words =[];
   private corpusSize;
   private angularFire;
   private IDFs = [];
   private corpus: FirebaseListObservable <any>;
-
   // private IDFs: FirebaseListObservable <any>;
 
   constructor (http: Http, af:AngularFire) {
+    console.log(this.words, this.article);
+
     this.http = http;
     this.angularFire = af;
     this.corpus = af.database.list('Evidence/Corpus/Articles');
+
     // this.IDFs   = af.database.list('Evidence/Corpus/IDFs');
   }
 
+  ngOnInit(){
+    Observable.timer(100,2200).subscribe(this.wordAnalyzer);
+    Observable.timer(100,1000).subscribe(this.getArticle);
+    Observable.timer(100,800).subscribe(this.evaluateWords);
+    Observable.timer(100,300).subscribe(this.countInstances);
+  }
+
   wordAnalyzer(url) {
+    var self = this;
     return this.getArticle(this.getYahooQueryUrl(url))
       .subscribe(
         data => {
           this.resetCounters();
-          this.findInKey(data, 'content');
-          if(this.article)
-            this.words = this.evaluateWords(
-              this.countInstances(this.extractWords(this.article))
+          this.findKey(data, 'content');
+          if(this.article) {
+            this.evaluateWords( // normalizeWords
+              this.countInstances(
+                this.extractWords(this.article)
+              )
             );
-          this.corpus.push({article: this.article});
-
+          }
         });
   }
 
@@ -44,35 +55,37 @@ export class EvidenceService {
     var self = this;
     var words = [];
     var normFactor = this.calculateNorm(instances);
-    // ===========>>> this loop can be converted
-    instances.forEach(function (w) {
-      if (w.word.length < 30) {
-        var normalized = w.count/normFactor;
-        self.calculateIDF(w).then(data => {
-          words.push({
-            word:w.word,
-            count:w.count,
-            idf:parseFloat(data).toFixed(5),
-            normalized:normalized.toFixed(5),
-            tfidf_C:(w.count*data).toFixed(5),
-            tfidf_N:(normalized*data).toFixed(5)
-          });
-          // if(words.length == instances.length)
-          //   self.corpus.push({article: self.article});//, summary: words})
-        });
+
+    Promise.all(
+      instances.map( function (w) {
+        if (w.word.length < 30) {
+          self.calculateIDF(w)
+            .then(data => {
+              self.words.push({
+                word: w.word,
+                count: w.count,
+                normalized: normalized.toFixed(5),
+                idf: parseFloat(data).toFixed(5),
+                tfidf_C: (w.count * data).toFixed(5),
+                tfidf_N: (normalized * data).toFixed(5)
+              });
+            });
+
+          var normalized = w.count / normFactor;
+          w['normalized']=normalized.toFixed(5);
+        }
+        return w;
+      })
+    ).then(
+      data => {
+        this.corpus.push({article:this.article, summary:data});
       }
-    });
-    // new Promise(function(resolve, reject) {
-    //   resolve(words)
-    // }).then( words => {
-    //   this.corpus.push({article: this.article, summary: words})
-    // });
-    return words;
+    );
   }
 
   resetCounters() {
     this.article = null;
-    this.words = null;
+    this.words = [];
   }
 
   calculateNorm (rawWords) {
@@ -84,10 +97,10 @@ export class EvidenceService {
     return Math.sqrt(total);
   }
 
-  findInKey(object, string) {
+  findKey(object, string) {
     for (var key in object) {
       if (object[key] && typeof(object[key])=="object") {
-        this.findInKey(object[key], string );
+        this.findKey(object[key], string );
       } else if (
         key == string ||
         typeof (key) == "string" &&
@@ -118,7 +131,6 @@ export class EvidenceService {
   countInstances (allWords) {
     // create an object for word instances and their counts
     var instances = {};
-    // =======>>> can convert the async loop into a normal for loop
     allWords.forEach(function (word) {
       if (instances.hasOwnProperty(word)) {
         instances[word]++;
@@ -135,10 +147,11 @@ export class EvidenceService {
     var sortedWords = Object.keys(instances).sort(function(a,b) {
         return instances[a]-instances[b]
     });
-    // =============== convert the loop here
+    // // =============== convert the loop here
     sortedWords.forEach(function (word) {
       words.push({word:word, count:instances[word]});
     });
+
     return words;
   }
 
@@ -156,16 +169,16 @@ export class EvidenceService {
     return this.countDocsWith(word)
       .then(data => {
         idf = Math.log2((this.corpusSize == 0)?1:this.corpusSize / (1 + data));
-        console.log(
-          'idf:',idf,
-          'corpus size:', this.corpusSize,
-          'docs with word:'+word.word, data
-        );
+        // console.log(
+        //   'idf:',idf,
+        //   '/ corpus size:', this.corpusSize,
+        //   '/ docs with word \"'+word.word+'\": ', data
+        // );
 
         this.IDFs.some((item: any) => {
           if (item.name === word.word) {
             exists = true;
-            console.log(item,'it was:',idf);
+            //console.log(item,'it was:',idf);
             item.idf = idf;  // increase by one to cover the current document
             return exists;
           }
@@ -173,6 +186,7 @@ export class EvidenceService {
         if(!exists) {
           this.IDFs.push({name:word.word, idf:idf});
         }
+        // console.log('IDFs:', this.IDFs);
         return idf;
       });
   }
@@ -184,7 +198,7 @@ export class EvidenceService {
     IDFs.some((item: any) => {
       if (item.name === word.word) {
         idf = item.idf ++;  // increase by one to cover the current document
-        console.log(item,'it was:',idf-1);
+        // console.log(item,'it was:',idf-1);
         return true;
       }
     });
