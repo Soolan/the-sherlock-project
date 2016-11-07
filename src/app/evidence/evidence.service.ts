@@ -21,15 +21,17 @@ export class EvidenceService implements OnInit{
     this.http = http;
     this.angularFire = af;
     this.corpus = af.database.list('Evidence/Corpus/Articles');
-
     // this.IDFs   = af.database.list('Evidence/Corpus/IDFs');
   }
 
   ngOnInit(){
-    Observable.timer(100,1000).subscribe(this.wordAnalyzer);
-    Observable.timer(100,800).subscribe(this.getArticle);
-    Observable.timer(100,600).subscribe(this.evaluateWords);
-    Observable.timer(100,400).subscribe(this.countInstances);
+    // Observable.timer(100,5000).subscribe(this.wordAnalyzer);
+    // Observable.timer(100,3000).subscribe(this.getArticle);
+    // Observable.timer(100,2000).subscribe(this.evaluateWords);
+    // Observable.timer(800,2000).subscribe(this.calculateIDF);
+    // Observable.timer(800,9000).subscribe(this.countDocsWith);
+    // // Observable.timer(800,500).subscribe(this.sortWords);
+    // Observable.timer(100,1000).subscribe(this.countInstances);
   }
 
   wordAnalyzer(url) {
@@ -58,17 +60,17 @@ export class EvidenceService implements OnInit{
         if (w.word.length < 30) {
           var normalized = w.count/normFactor;
           w['normalized']=normalized.toFixed(5);
-          // self.calculateIDF(w)
-          //   .then(data => {
-          //     self.words.push({
-          //       word: w.word,
-          //       count: w.count,
-          //       normalized: w.normalized,
-          //       idf: parseFloat(data).toFixed(5),
-          //       tfidf_C: (w.count * data).toFixed(5),
-          //       tfidf_N: (normalized * data).toFixed(5)
-          //     });
-          //   });
+          self.calculateIDF(w)
+            .then(data => {
+              self.words.push({
+                word: w.word,
+                count: w.count,
+                normalized: w.normalized,
+                idf: parseFloat(data).toFixed(5),
+                tfidf_C: (w.count * data).toFixed(5),
+                tfidf_N: (normalized * data).toFixed(5)
+              });
+            });
         }
         return w;
       })
@@ -76,18 +78,6 @@ export class EvidenceService implements OnInit{
       data => {
         console.log('pushing');
         this.corpus.push({article:this.article, bag_of_words:data});
-        var w = data;
-        self.calculateIDF(data)
-          .then(idf => {
-            self.words.push({
-              word: w.word,
-              count: w.count,
-              normalized: w.normalized,
-              idf: parseFloat(idf).toFixed(5),
-              tfidf_C: (w.count * idf).toFixed(5),
-              tfidf_N: (normalized * idf).toFixed(5)
-            });
-          });
       }
     );
   }
@@ -197,7 +187,6 @@ export class EvidenceService implements OnInit{
         if(!exists) {
           this.IDFs.push({name:word.word, idf:idf});
         }
-        console.log('IDFs:', this.IDFs);
         return idf;
       });
   }
@@ -271,6 +260,7 @@ export class EvidenceService implements OnInit{
         this.corpusSize = snapshot.numChildren();
         if (this.corpusSize > 1) {
           snapshot.forEach((item: any) => {
+            // console.log('inside countDocs');
             if (item.child('article').val().indexOf(word.word) > 0)
               count++;
           });
@@ -303,20 +293,39 @@ export class EvidenceService implements OnInit{
 
   fetchLinks(keyword) {
     var self = this;
-    timeSpans.forEach(function (period) {
-      self.getSearchResults(self.getGoogleQueryUrl(keyword, period))
-        .subscribe(data => data.forEach(function (item) {
-            self.wordAnalyzer(item.link);
-       //     console.log('links:', data);
-          })
-        )
+
+    var links = [
+      'http://edition.cnn.com/2016/11/05/politics/trump-rushed-off-stage-at-campaign-rally/index.html',
+      'http://edition.cnn.com/2016/11/05/politics/next-us-president-global-challenges/index.html',
+      'http://edition.cnn.com/2016/11/04/politics/rudy-giuliani-hillary-clinton-email-fbi/index.html',
+      'http://edition.cnn.com/2016/11/04/politics/fox-news-weekend-poll-clinton-trump/index.html',
+      'http://edition.cnn.com/videos/tv/2016/11/05/poll-expert-i-will-eat-a-bug-if-trump-exceeds-240.cnn',
+      // 'http://edition.cnn.com/2016/11/04/opinions/trumps-1-to-10-scale-is-nothing-new-for-women-prusher/index.html',
+      // 'http://edition.cnn.com/2016/11/04/opinions/what-happens-if-election-contested-douglas/index.html',
+      // 'http://edition.cnn.com/2016/11/05/middleeast/iraq-mosul-offensive/index.html',
+      // 'http://edition.cnn.com/2016/11/06/asia/afghanistan-australian-kidnapping/index.html',
+      // 'http://edition.cnn.com/2016/11/06/americas/nicaragua-presidential-election/index.html',
+      // 'http://edition.cnn.com/2016/11/05/europe/brexit-gina-miller-threats/index.html',
+      // 'http://edition.cnn.com/2016/11/06/sport/breeders-cup-classic-california-chrome/index.html',
+      // 'http://edition.cnn.com/2016/11/02/architecture/obama-living-quarters-white-house/index.html'
+    ];
+    links.forEach( function (item) {
+      self.wordAnalyzer(item);
     });
+
+    // timeSpans.forEach(function (period) {
+    //   self.getSearchResults(self.getGoogleQueryUrl(keyword, period))
+    //     .subscribe(data => data.forEach(function (item) {
+    //         self.wordAnalyzer(item.link);
+    //    //     console.log('links:', data);
+    //     }))
+    // });
   }
 
   getGoogleQueryUrl(keyword, range) {
     return "https://www.googleapis.com/customsearch/v1?" +
       "key=" + googleSearchConfig.apiKey + "&cx=" + googleSearchConfig.cx +
-      "&q=" + keyword + "&sort=" + range.sort + "&num=5&dateRestrict=" + range.span ;
+      "&q=" + keyword + "&sort=" + range.sort + "&num=3&dateRestrict=" + range.span ;
   }
 
   getSearchResults(url) {
