@@ -32,6 +32,10 @@ export class EvidenceComponent {
     this.evidenceService.wordAnalyzer(url);
   }
 
+  onIDFs() {
+    this.evidenceService.saveIDFs();
+  }
+
   buildCorpus() {
     // ToDo: build the corpus
     // Fetch news for the main

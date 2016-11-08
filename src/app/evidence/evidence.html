@@ -42,18 +42,19 @@
   <div class="col-md-7">
     <div class="panel panel-default ">
       <!-- Default panel contents -->
-      <div class="panel-heading">Processed words</div>
+      <div class="panel-heading">Processed words
+        (corpus: {{evidenceService.corpusSize}} items - vocabulary: {{evidenceService.vocabularySize}} words)
+        <button class="btn btn-default btn-xs pull-right" type="button" (click)="onIDFs()">Calculate IDFs</button>
+      </div>
       <!-- Table -->
-      <table class="table">
+      <div class="col-md-7">
+        <table class="table">
         <thead>
         <tr>
           <th>#</th>
           <th>Words</th>
           <th>Counts</th>
           <th>Normalized</th>
-          <th>IDF factor</th>
-          <th>TFIDF(C)</th>
-          <th>TFIDF(N)</th>
         </tr>
         </thead>
         <tbody *ngFor="let w of evidenceService.words; let i=index">
@@ -62,13 +63,28 @@
           <td>{{w.word}}</td>
           <td>{{w.count}}</td>
           <td>{{w.normalized}}</td>
-          <td>{{w.idf}}</td>
-          <td>{{w.tfidf_C}}</td>
-          <td>{{w.tfidf_N}}</td>
-
         </tr>
         </tbody>
       </table>
+      </div>
+      <div class="col-md-5">
+        <table class="table">
+        <thead>
+        <tr>
+          <th>IDF</th>
+          <th>TF-IDF(C)</th>
+          <th>TF-IDF(N)</th>
+        </tr>
+        </thead>
+        <tbody *ngFor="let w of evidenceService.words; let i=index">
+        <tr>
+          <td>{{w.idf}}</td>
+          <td>{{w.tfidf_C}}</td>
+          <td>{{w.tfidf_N}}</td>
+        </tr>
+        </tbody>
+      </table>
+      </div>
     </div>
   </div>
 </div>
