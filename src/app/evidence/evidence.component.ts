@@ -46,6 +46,6 @@ export class EvidenceComponent {
   buildClusters() {
   //   // ToDo: build the corpus
   //   // Fetch news for the main
-  //   this.evidenceService.clusterBuilder(this.clusterKeywords);
+    this.evidenceService.clusterBuilder(this.clusterKeywords);
   }
 }

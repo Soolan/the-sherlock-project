@@ -16,12 +16,14 @@ export class EvidenceService implements OnInit{
   // private IDFs = [];
   private corpus: FirebaseListObservable <any>;
   private IDFs: FirebaseListObservable <any>;
+  private clusters: FirebaseListObservable <any>;
 
   constructor (http: Http, af:AngularFire) {
     this.http = http;
     this.angularFire = af;
     this.corpus = af.database.list('Evidence/Corpus/Articles');
     this.IDFs   = af.database.list('Evidence/Corpus/IDFs');
+    this.clusters   = af.database.list('Evidence/Clusters');
   }
 
   ngOnInit(){
@@ -45,7 +47,9 @@ export class EvidenceService implements OnInit{
               this.countInstances(
                 this.extractWords(this.article)
               )
-            );
+            ).then( data => {
+              this.corpus.push({article:this.article, link:url, bag_of_words:data});
+            });;
           }
         });
   }
@@ -54,16 +58,14 @@ export class EvidenceService implements OnInit{
   evaluateWords(instances) {
     var self = this;
     var normFactor = this.calculateNorm(instances);
-    Promise.all( instances.map( function (w) {
+    return Promise.all( instances.map( function (w) {
       if (w.word.length < 20) {
         var normalized = w.count/normFactor;
         w['normalized']=normalized.toFixed(4);
         self.words.push(w);
       }
       return w;
-    })).then( data => {
-      this.corpus.push({article:this.article, bag_of_words:data});
-    });
+    }));
   }
 
   resetCounters() {
@@ -158,8 +160,8 @@ export class EvidenceService implements OnInit{
       .then(snapshot => {
         this.corpusSize = snapshot.numChildren();
 
-        snapshot.forEach( item => {
-          item.child('bag_of_words').val().forEach( w => {
+        snapshot.forEach(item => {
+          item.child('bag_of_words').val().forEach(w => {
             uniqueBagOfWords.hasOwnProperty(w.word) ?
               uniqueBagOfWords[w.word]++ :
               uniqueBagOfWords[w.word] = 1;
@@ -167,17 +169,17 @@ export class EvidenceService implements OnInit{
         });
         var words = Object.keys(uniqueBagOfWords);
         this.vocabularySize = words.length;
-        words.forEach( word => {
+        words.forEach(word => {
           var idf = Math.abs(Math.log2(
-            (this.corpusSize == 0)?
-              1:this.corpusSize/(uniqueBagOfWords[word]+1)
+            (this.corpusSize == 0) ?
+              1 : this.corpusSize / (uniqueBagOfWords[word] + 1)
           ));
           this.IDFs.push({
-            'word':word, 'doc_with_word':uniqueBagOfWords[word], 'IDF':idf
+            'word': word, 'doc_with_word': uniqueBagOfWords[word], 'IDF': idf
           })
           // this.words[this.words.indexOf(word)]['idf'] = idf;
-          this.words.some(function(item) {
-            if(item.word === word) {
+          this.words.some(function (item) {
+            if (item.word === word) {
               item['idf'] = idf.toFixed(4);
               item['tfidf_C'] = (idf * item.count).toFixed(4);
               item['tfidf_N'] = (idf * item.normalized).toFixed(4);
@@ -186,7 +188,7 @@ export class EvidenceService implements OnInit{
           })
 
         });
-      })
+      });
   }
 
   getIDF(word, IDFs) {
@@ -228,7 +230,6 @@ export class EvidenceService implements OnInit{
       self.getSearchResults(self.getGoogleQueryUrl(keyword, period))
         .subscribe(data => data.forEach(function (item) {
             self.wordAnalyzer(item.link);
-       //     console.log('links:', data);
         }))
     });
   }
@@ -244,5 +245,42 @@ export class EvidenceService implements OnInit{
       .map((res: Response) => res.json())
       .map(data => data.items)
       .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
+  }
+
+  clusterBuilder(centers) {
+    // Find all articles which contain the keyword+Trump
+    // set the one with the highest repition of those words as center
+    // calculate the center value: sum((bag of words)*(bag of words))
+    // find the closest ones:
+    // distance = center value - sum ((center:bag of words) * (item:bag of words))
+    // choose top 10 min distance and save them in a cluster
+    var self = this;
+    var weight = 0;
+    var tempCluster = [];
+    var c = {};
+
+    var threshold = 20;
+    var keywords = centers.split(",");
+    keywords.forEach(function (word) {
+      self.corpus._ref.once("value")
+        .then(snapshot => {
+          snapshot.forEach(item => {
+            item.child('bag_of_words').val().forEach(w => {
+              if (w.word == word || w.word == "Trump")
+                weight += w.count;
+            });
+            if( weight> threshold) {
+              tempCluster.push({id:item.key, weight:weight});
+              weight = 0;
+            }
+          })
+          c[word] = tempCluster;
+          c[word].sort(function(a,b) {
+            return (a.weight < b.weight) ? 1 : ((b.weight < a.weight) ? -1 : 0);
+          });
+          tempCluster = [];
+          // console.log(c);
+        })
+    });
   }
 }
