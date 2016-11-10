@@ -258,7 +258,6 @@ export class EvidenceService implements OnInit{
     var weight = 0;
     var tempCluster = [];
     var c = {};
-
     var threshold = 20;
     var keywords = centers.split(",");
     keywords.forEach(function (word) {
@@ -270,7 +269,7 @@ export class EvidenceService implements OnInit{
                 weight += w.count;
             });
             if( weight> threshold) {
-              tempCluster.push({id:item.key, weight:weight});
+              tempCluster.push({id:item.key, weight:weight, item:item});
               weight = 0;
             }
           })
@@ -278,9 +277,23 @@ export class EvidenceService implements OnInit{
           c[word].sort(function(a,b) {
             return (a.weight < b.weight) ? 1 : ((b.weight < a.weight) ? -1 : 0);
           });
+          console.log(
+            tempCluster[0].item.child('bag_of_words').val(),
+            tempCluster[0].id,
+            tempCluster[0].weight
+          );
+
+          // console.log(tempCluster[0]);
           tempCluster = [];
           // console.log(c);
         })
     });
+    // var promise = new Promise(function(resolve, reject) {
+    //     resolve(c)
+    //       .then(
+    //
+    //       )
+    //     ;
+    // });
   }
 }
