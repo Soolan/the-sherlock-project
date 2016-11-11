@@ -255,45 +255,74 @@ export class EvidenceService implements OnInit{
     // distance = center value - sum ((center:bag of words) * (item:bag of words))
     // choose top 10 min distance and save them in a cluster
     var self = this;
-    var weight = 0;
-    var tempCluster = [];
-    var c = {};
-    var threshold = 20;
+    var count;
+    var max;
+    var clusterCenters = {};
+    var flag;
     var keywords = centers.split(",");
-    keywords.forEach(function (word) {
-      self.corpus._ref.once("value")
-        .then(snapshot => {
-          snapshot.forEach(item => {
-            item.child('bag_of_words').val().forEach(w => {
-              if (w.word == word || w.word == "Trump")
-                weight += w.count;
-            });
-            if( weight> threshold) {
-              tempCluster.push({id:item.key, weight:weight, item:item});
-              weight = 0;
-            }
-          })
-          c[word] = tempCluster;
-          c[word].sort(function(a,b) {
-            return (a.weight < b.weight) ? 1 : ((b.weight < a.weight) ? -1 : 0);
-          });
-          console.log(
-            tempCluster[0].item.child('bag_of_words').val(),
-            tempCluster[0].id,
-            tempCluster[0].weight
-          );
+    var records = this.corpus._ref.once("value");
 
-          // console.log(tempCluster[0]);
-          tempCluster = [];
-          // console.log(c);
+    keywords.forEach(function (word) {
+      max = 0;
+      records.then(snapshot => {
+        snapshot.forEach(article => {
+          count = 0;
+          flag = false;
+          article.child('bag_of_words').val().forEach(w => {
+            if (w.word == word || w.word == "Trump") {
+              console.log('current article id, word and count:', article.key, w.word, w.count, w.normalized);
+              count += w.count;
+              if (w.word == word) flag=true;
+            }
+          });
+          if(flag && count>max) {
+            max = count;
+            console.log('id:'+article.key, 'count:'+count, 'cluster keyword:'+ word);
+            clusterCenters[word] = {
+              id:article.key,
+              bag_of_words:article.child('bag_of_words').val()
+            }
+          }
         })
+        return clusterCenters;
+      }).then(centers => {
+        var centerWeight = 0;
+        var centerWeightN= 0;
+          // console.log('c:',centers[word]);
+        centers[word].bag_of_words.forEach(w => {
+          centerWeight += w.count * w.count;
+          if (w.normalized === undefined) w.normalized=0;
+          centerWeightN += w.normalized * w.normalized;
+          console.log(word, w.word, centerWeight, w.count, centerWeightN, w.normalized);
+        });
+        centers[word]['weight'] = centerWeight;
+        centers[word]['weightN'] = centerWeightN;
+        console.log('centers: ',centers);
+        return centers;
+        }).then( centers => {
+
+        records.then(snapshot => {
+          var observations = {};
+          snapshot.forEach(article => {
+            var sum = 0;
+            var d = 0;
+            article.child('bag_of_words').val().forEach(w => {
+              Object.keys(centers).forEach(keyword => {
+                console.log()
+                // centers[keyword].bag_of_words.forEach( k => {
+                //   if(k.word == w.word) {
+                //     sum += k.normalized * w.normalized;
+                //   }
+                // })
+                // d = 1-sum;
+                // observations[keyword].push({id:article.key, distance:d});
+              })
+              // console.log(observations);
+            })
+          })
+        })
+      })
     });
-    // var promise = new Promise(function(resolve, reject) {
-    //     resolve(c)
-    //       .then(
-    //
-    //       )
-    //     ;
-    // });
   }
 }
+
