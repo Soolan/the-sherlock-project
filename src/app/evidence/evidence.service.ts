@@ -6,10 +6,10 @@ import {AngularFire, FirebaseListObservable} from "angularfire2";
 import {googleSearchConfig, timeSpans} from "../app.module";
 
 @Injectable()
-export class EvidenceService implements OnInit{
+export class EvidenceService implements OnInit {
   private http;
-  private article='';
-  private words =[];
+  private article = '';
+  private words = [];
   private corpusSize;
   private vocabularySize;
   private angularFire;
@@ -18,15 +18,15 @@ export class EvidenceService implements OnInit{
   private IDFs: FirebaseListObservable <any>;
   private clusters: FirebaseListObservable <any>;
 
-  constructor (http: Http, af:AngularFire) {
+  constructor(http: Http, af: AngularFire) {
     this.http = http;
     this.angularFire = af;
     this.corpus = af.database.list('Evidence/Corpus/Articles');
-    this.IDFs   = af.database.list('Evidence/Corpus/IDFs');
-    this.clusters   = af.database.list('Evidence/Clusters');
+    this.IDFs = af.database.list('Evidence/Corpus/IDFs');
+    this.clusters = af.database.list('Evidence/Clusters');
   }
 
-  ngOnInit(){
+  ngOnInit() {
     // Observable.timer(100,5000).subscribe(this.wordAnalyzer);
     // Observable.timer(100,3000).subscribe(this.getArticle);
     // Observable.timer(100,2000).subscribe(this.evaluateWords);
@@ -42,14 +42,15 @@ export class EvidenceService implements OnInit{
         data => {
           this.resetCounters();
           this.findKey(data, 'content');
-          if(this.article) {
+          if (this.article) {
             this.evaluateWords( // normalizeWords
               this.countInstances(
                 this.extractWords(this.article)
               )
-            ).then( data => {
-              this.corpus.push({article:this.article, link:url, bag_of_words:data});
-            });;
+            ).then(data => {
+              this.corpus.push({article: this.article, link: url, bag_of_words: data});
+            });
+            ;
           }
         });
   }
@@ -58,10 +59,10 @@ export class EvidenceService implements OnInit{
   evaluateWords(instances) {
     var self = this;
     var normFactor = this.calculateNorm(instances);
-    return Promise.all( instances.map( function (w) {
+    return Promise.all(instances.map(function (w) {
       if (w.word.length < 20) {
-        var normalized = w.count/normFactor;
-        w['normalized']=normalized.toFixed(4);
+        var normalized = w.count / normFactor;
+        w['normalized'] = normalized.toFixed(4);
         self.words.push(w);
       }
       return w;
@@ -73,7 +74,7 @@ export class EvidenceService implements OnInit{
     this.words = [];
   }
 
-  calculateNorm (rawWords) {
+  calculateNorm(rawWords) {
     // Norm factor = Square Root of (Sum of(each word value power 2));
     var total = 0;
     rawWords.forEach(function (w) {
@@ -84,8 +85,8 @@ export class EvidenceService implements OnInit{
 
   findKey(object, string) {
     for (var key in object) {
-      if (object[key] && typeof(object[key])=="object") {
-        this.findKey(object[key], string );
+      if (object[key] && typeof(object[key]) == "object") {
+        this.findKey(object[key], string);
       } else if (
         key == string ||
         typeof (key) == "string" &&
@@ -100,20 +101,20 @@ export class EvidenceService implements OnInit{
 
   getArticle(url) {
     return this.http.get(url)
-      .map((res:Response) => res.json())
+      .map((res: Response) => res.json())
       .map(data => data.query.results)
-      .catch((error:any) => Observable.throw(error.json().error || 'Server error'));
+      .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
   }
 
   extractWords(article) {
     // remove all symbols from the article
-    var cleanse = article.replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+    var cleanse = article.replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g, "");
     // extract all words available between white spaces. (tabs, spaces, etc)
     // and return the result as an array of words,
     return cleanse.split(/\s+/);
   }
 
-  countInstances (allWords) {
+  countInstances(allWords) {
     // create an object for word instances and their counts
     var instances = {};
     allWords.forEach(function (word) {
@@ -127,22 +128,22 @@ export class EvidenceService implements OnInit{
   }
 
   // sort the words and save them as an array of objects
-  sortWords (instances) {
+  sortWords(instances) {
     var words = [];
-    var sortedWords = Object.keys(instances).sort(function(a,b) {
-        return instances[b]-instances[a]
+    var sortedWords = Object.keys(instances).sort(function (a, b) {
+      return instances[b] - instances[a]
     });
     // // =============== convert the loop here
     sortedWords.forEach(function (word) {
-      words.push({word:word, count:instances[word]});
+      words.push({word: word, count: instances[word]});
     });
 
     return words;
   }
 
-  getYahooQueryUrl (link) {
+  getYahooQueryUrl(link) {
     return "https://query.yahooapis.com/v1/public/yql?" +
-      "q=select * from html where url=\""+ link +"\" and "+
+      "q=select * from html where url=\"" + link + "\" and " +
       "xpath=\"//*[contains(@class,\'paragraph\')]|//p\"" +
       "&format=json&diagnostics=true&callback=";
   }
@@ -153,7 +154,7 @@ export class EvidenceService implements OnInit{
   // 4. find number of articles that each unique word exist in them
   // 5. calculate idf
   // 6. save IDFs as array of {word:'', number_of_docs:'', idf:''}
-  saveIDFs () {
+  saveIDFs() {
     var uniqueBagOfWords = {};
     this.IDFs.remove();
     this.corpus._ref.once("value")
@@ -209,7 +210,7 @@ export class EvidenceService implements OnInit{
     // 2. Pass the link to EvidenceService for extracting contents
     // 3. Save them under corpus key for further calculation
     var keywords = this.setKeywordArray(mainKeyword, supportKeywords);
-    keywords.forEach( (keyword: any) => {
+    keywords.forEach((keyword: any) => {
       this.fetchLinks(keyword);
     })
   }
@@ -229,7 +230,7 @@ export class EvidenceService implements OnInit{
     timeSpans.forEach(function (period) {
       self.getSearchResults(self.getGoogleQueryUrl(keyword, period))
         .subscribe(data => data.forEach(function (item) {
-            self.wordAnalyzer(item.link);
+          self.wordAnalyzer(item.link);
         }))
     });
   }
@@ -237,7 +238,7 @@ export class EvidenceService implements OnInit{
   getGoogleQueryUrl(keyword, range) {
     return "https://www.googleapis.com/customsearch/v1?" +
       "key=" + googleSearchConfig.apiKey + "&cx=" + googleSearchConfig.cx +
-      "&q=" + keyword + "&sort=" + range.sort + "&dateRestrict=" + range.span ;
+      "&q=" + keyword + "&sort=" + range.sort + "&num=3&dateRestrict=" + range.span;
   }
 
   getSearchResults(url) {
@@ -248,80 +249,64 @@ export class EvidenceService implements OnInit{
   }
 
   clusterBuilder(centers) {
-    // Find all articles which contain the keyword+Trump
-    // set the one with the highest repition of those words as center
-    // calculate the center value: sum((bag of words)*(bag of words))
-    // find the closest ones:
-    // distance = center value - sum ((center:bag of words) * (item:bag of words))
-    // choose top 10 min distance and save them in a cluster
     var self = this;
     var count;
     var max;
     var clusterCenters = {};
+    var observations = {};
     var flag;
     var keywords = centers.split(",");
     var records = this.corpus._ref.once("value");
 
     keywords.forEach(function (word) {
-      max = 0;
-      records.then(snapshot => {
-        snapshot.forEach(article => {
-          count = 0;
-          flag = false;
-          article.child('bag_of_words').val().forEach(w => {
-            if (w.word == word || w.word == "Trump") {
-              console.log('current article id, word and count:', article.key, w.word, w.count, w.normalized);
-              count += w.count;
-              if (w.word == word) flag=true;
-            }
-          });
-          if(flag && count>max) {
-            max = count;
-            console.log('id:'+article.key, 'count:'+count, 'cluster keyword:'+ word);
-            clusterCenters[word] = {
-              id:article.key,
-              bag_of_words:article.child('bag_of_words').val()
-            }
-          }
-        })
-        return clusterCenters;
-      }).then(centers => {
-        var centerWeight = 0;
-        var centerWeightN= 0;
-          // console.log('c:',centers[word]);
-        centers[word].bag_of_words.forEach(w => {
-          centerWeight += w.count * w.count;
-          if (w.normalized === undefined) w.normalized=0;
-          centerWeightN += w.normalized * w.normalized;
-          console.log(word, w.word, centerWeight, w.count, centerWeightN, w.normalized);
-        });
-        centers[word]['weight'] = centerWeight;
-        centers[word]['weightN'] = centerWeightN;
-        console.log('centers: ',centers);
-        return centers;
-        }).then( centers => {
-
-        records.then(snapshot => {
-          var observations = {};
+      observations[word] = [];
+      records
+        .then(snapshot => {
+          max = 0;
           snapshot.forEach(article => {
-            var sum = 0;
-            var d = 0;
+            count = 0;
+            flag = false;
             article.child('bag_of_words').val().forEach(w => {
-              Object.keys(centers).forEach(keyword => {
-                console.log()
-                // centers[keyword].bag_of_words.forEach( k => {
-                //   if(k.word == w.word) {
-                //     sum += k.normalized * w.normalized;
-                //   }
-                // })
-                // d = 1-sum;
-                // observations[keyword].push({id:article.key, distance:d});
-              })
-              // console.log(observations);
-            })
+              if (w.word == word) count += w.count;
+              if (w.word == "Trump") flag = true;
+            });
+            if (flag && count > max) {
+              max = count;
+              clusterCenters[word] = {
+                id: article.key,
+                bag_of_words: article.child('bag_of_words').val()
+              }
+            }
           })
-        })
-      })
+          return clusterCenters;
+        })// find article with max value for Trump+word return {word:{}}
+        .then(centers => {
+          console.log('=centers=>', centers);
+          var i = 1;
+          records
+            .then(snapshot => {
+              snapshot.forEach(article => {
+                var sum = 0;
+                var d = 0;
+                centers[word].bag_of_words.forEach(k => {
+                  article.child('bag_of_words').val().forEach(w => {
+                    if (k.word == w.word) {
+                      sum += isNaN(k.normalized * w.normalized)?
+                        0:(k.normalized * w.normalized);
+                    }
+                  })
+                })
+                d = 1 - sum;
+                observations[word].push({id: article.key, distance: d.toFixed(4)});
+                console.log(word, d, i++);
+              })
+              observations[word].sort(function(a,b) {
+                return  a['distance'] - b['distance'];
+              });
+              console.log(observations);
+            })
+        })// calculate distance to the centers for all articles in the corpus
+
     });
   }
 }

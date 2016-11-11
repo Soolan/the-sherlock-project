@@ -41,7 +41,7 @@ export const timeSpans = [
   {"span": "d1", "sort": "date:d"},
   {"span":"w1", "sort":"date:a"},
   {"span":"m1", "sort":"date:a"},
-  {"span":"m3", "sort":"date:a"},
+  {"span":"m6", "sort":"date:a"},
   {"span":"y1", "sort":"date:a"},
   {"span":"y10","sort":"date:a"}
 ];
