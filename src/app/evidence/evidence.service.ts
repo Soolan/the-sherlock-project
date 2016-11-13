@@ -16,14 +16,14 @@ export class EvidenceService implements OnInit {
   // private IDFs = [];
   private corpus: FirebaseListObservable <any>;
   private IDFs: FirebaseListObservable <any>;
-  private clusters: FirebaseListObservable <any>;
+  private clusters;//: FirebaseListObservable <any>;
 
   constructor(http: Http, af: AngularFire) {
     this.http = http;
     this.angularFire = af;
     this.corpus = af.database.list('Evidence/Corpus/Articles');
     this.IDFs = af.database.list('Evidence/Corpus/IDFs');
-    this.clusters = af.database.list('Evidence/Clusters');
+    // this.clusters = af.database.list('Evidence/Clusters');
   }
 
   ngOnInit() {
@@ -32,7 +32,7 @@ export class EvidenceService implements OnInit {
     // Observable.timer(100,2000).subscribe(this.evaluateWords);
     // Observable.timer(800,2000).subscribe(this.calculateIDF);
     // Observable.timer(800,9000).subscribe(this.countDocsWith);
-    // // Observable.timer(800,500).subscribe(this.sortWords);
+    // Observable.timer(800,500).subscribe(this.sortWords);
     // Observable.timer(100,1000).subscribe(this.countInstances);
   }
 
@@ -254,60 +254,81 @@ export class EvidenceService implements OnInit {
     var max;
     var clusterCenters = {};
     var observations = {};
+    var network = {};
+    var nodes = []; //{id, label}
+    var edges = []; //{from, to}
+    var currentCenterId; // id
     var flag;
     var keywords = centers.split(",");
     var records = this.corpus._ref.once("value");
-
-    keywords.forEach(function (word) {
-      observations[word] = [];
-      records
-        .then(snapshot => {
-          max = 0;
-          snapshot.forEach(article => {
-            count = 0;
-            flag = false;
-            article.child('bag_of_words').val().forEach(w => {
-              if (w.word == word) count += w.count;
-              if (w.word == "Trump") flag = true;
-            });
-            if (flag && count > max) {
-              max = count;
-              clusterCenters[word] = {
-                id: article.key,
-                bag_of_words: article.child('bag_of_words').val()
-              }
-            }
-          })
-          return clusterCenters;
-        })// find article with max value for Trump+word return {word:{}}
-        .then(centers => {
-          console.log('=centers=>', centers);
-          var i = 1;
-          records
-            .then(snapshot => {
-              snapshot.forEach(article => {
-                var sum = 0;
-                var d = 0;
-                centers[word].bag_of_words.forEach(k => {
-                  article.child('bag_of_words').val().forEach(w => {
-                    if (k.word == w.word) {
-                      sum += isNaN(k.normalized * w.normalized)?
-                        0:(k.normalized * w.normalized);
-                    }
-                  })
-                })
-                d = 1 - sum;
-                observations[word].push({id: article.key, distance: d.toFixed(4)});
-                console.log(word, d, i++);
-              })
-              observations[word].sort(function(a,b) {
-                return  a['distance'] - b['distance'];
+    var id = 1;
+    // return Promise.all([1, 2, 3, 4, 5].map(fn)).then();
+    return Promise.all(keywords.map(function (word) {
+        // keywords.forEach(function (word) {
+        observations[word] = [];
+        records
+          .then(snapshot => {
+            max = 0;
+            snapshot.forEach(article => {
+              count = 0;
+              flag = false;
+              article.child('bag_of_words').val().forEach(w => {
+                if (w.word == word) count += w.count;
+                if (w.word == "Trump") flag = true;
               });
-              console.log(observations);
+              if (flag && count > max) {
+                max = count;
+                clusterCenters[word] = {
+                  id: article.key,
+                  bag_of_words: article.child('bag_of_words').val()
+                }
+              }
             })
-        })// calculate distance to the centers for all articles in the corpus
-
-    });
+            currentCenterId = id++; //clusterCenters[word].id;
+            nodes.push({id: currentCenterId, label: word});
+            return clusterCenters;
+          })// find article with max value for Trump+word return {word:{id,bag_of_words}}
+          .then(centers => {
+            // console.log('=centers=>', centers);
+            var i = 1;
+            return records
+              .then(snapshot => {
+                snapshot.forEach(article => {
+                  var sum = 0;
+                  var d = 0;
+                  centers[word].bag_of_words.forEach(k => {
+                    article.child('bag_of_words').val().forEach(w => {
+                      if (k.word == w.word) {
+                        sum += isNaN(k.normalized * w.normalized) ?
+                          0 : (k.normalized * w.normalized);
+                      }
+                    })
+                  })
+                  d = 1 - sum;
+                  observations[word].push({id: article.key, distance: d.toFixed(4)});
+                  // console.log(word, d, i++);
+                })
+                observations[word].sort(function (a, b) {
+                  return a['distance'] - b['distance'];
+                });
+                // console.log(observations);
+                return observations;
+              })
+          })// calculate distance to the centers for all articles in the corpus
+          // {word: [{id,distance}]}
+          .then(data => {
+            // console.log('--------' + data[word]);
+            data[word].forEach(item => {
+              nodes.push({id: id/*item.id*/, label: item.distance});
+              edges.push({from: currentCenterId, to: id /*item.id*/});
+              id++;
+            })
+          }) //network: {nodes:[{id,label}] , edges:[{from,to}]}
+        network = {nodes: nodes, edges: edges};
+        console.log('network:',network);
+        return network;
+      })
+    );
   }
 }
 

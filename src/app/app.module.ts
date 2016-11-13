@@ -18,8 +18,9 @@ import {RatingService} from "./rating/rating.service";
 import {RatingLogic} from "./rating/rating.logic";
 import {EvidenceComponent} from "./evidence/evidence.component";
 import {EvidenceService} from "./evidence/evidence.service";
-import {BusyModule} from 'angular2-busy';
 import {AiComponent} from './ai/ai.component';
+import {VisModule} from 'ng2-vis';
+import {ModalComponent} from './evidence/modal.component'
 
 export const firebaseConfig = {
   apiKey: "AIzaSyA8C9a7wZ9r-5BsMXJbP3-6_raliTVkHpk",
@@ -50,14 +51,14 @@ export const timeSpans = [
   declarations: [
     AppComponent, NavigationComponent, CollectorComponent,
     RatingComponent, NotifierComponent, EvidenceComponent,
-    AiComponent, OrderByPipe
+    AiComponent, OrderByPipe, ModalComponent
   ],
   schemas     : [CUSTOM_ELEMENTS_SCHEMA],
   imports     : [
     BrowserModule, FormsModule, HttpModule,
     RouterModule.forRoot(rootRouterConfig),
     AngularFireModule.initializeApp(firebaseConfig),
-    BusyModule
+    VisModule
   ],
   providers   : [
     {provide: LocationStrategy, useClass: HashLocationStrategy},
