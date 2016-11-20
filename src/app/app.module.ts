@@ -20,7 +20,7 @@ import {EvidenceComponent} from "./evidence/evidence.component";
 import {EvidenceService} from "./evidence/evidence.service";
 import {AiComponent} from './ai/ai.component';
 import {VisModule} from 'ng2-vis';
-import {ModalComponent} from './evidence/modal.component'
+import {ModalComponent} from './modal/modal.component';
 
 export const firebaseConfig = {
   apiKey: "AIzaSyA8C9a7wZ9r-5BsMXJbP3-6_raliTVkHpk",
@@ -39,7 +39,7 @@ export const googleSearchConfig = {
 };
 
 export const timeSpans = [
-  {"span": "d1", "sort": "date:d"},
+  {"span":"d1", "sort":"date:d"},
   {"span":"w1", "sort":"date:a"},
   {"span":"m1", "sort":"date:a"},
   {"span":"m6", "sort":"date:a"},

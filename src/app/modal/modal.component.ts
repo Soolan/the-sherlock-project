@@ -5,7 +5,7 @@ import { VisNetworkService } from 'ng2-vis/components/network';
 @Component({
   selector: 'sh-modal',
   templateUrl: 'modal.html',
-  styleUrls  : ['./app/evidence/modal.css']
+  styleUrls  : ['./app/modal/modal.css']
 })
 
 export class ModalComponent{
@@ -14,32 +14,12 @@ export class ModalComponent{
   public visNetwork: string = 'networkId1';
   public visNetworkData: Vis.IData;
   public visNetworkOptions: Vis.IOptions;
-  private visNetworkService: VisNetworkService;
+  public visNetworkService: VisNetworkService;
 
   constructor (vns: VisNetworkService) {
     this.visNetworkService = vns;
-    this.visNetworkOptions = {};
-
+    this.visNetworkOptions = {interaction:{hover:true}};
   }
-
-  // ngOnInit () {
-  //   this.visNetworkData= {
-  //     nodes: [
-  //       { id: '1', label: 'Node 1' },
-  //       { id: '2', label: 'Node 2' },
-  //       { id: '3', label: 'Node 3' },
-  //       { id: '4', label: 'Node 4' },
-  //       { id: '5', label: 'Node 5' }
-  //     ],
-  //     edges: [
-  //       { from: '1', to: '3' },
-  //       { from: '1', to: '2' },
-  //       { from: '2', to: '4' },
-  //       { from: '2', to: '5' }
-  //     ]
-  //   };
-  //   this.visNetworkOptions = {};
-  // }
 
   public networkInitialized(): void {
     // now we can use the service to register on events
@@ -54,16 +34,24 @@ export class ModalComponent{
       });
   }
 
+//   // create a network
+//     [visNetwork]="visNetwork"
+//     [visNetworkData]="visNetworkData"
+//     [visNetworkOptions]="visNetworkOptions"
+//     (initialized)="networkInitialized()
 
-  showModal()
+//   var container = document.getElementById('mynetwork');
+//   var data = {
+//   nodes: nodes,
+//   edges: edges
+// };
+//   var options = {interaction:{hover:true}};
+//   var network = new vis.Network(container, data, options);
+
+
+  showModal(data)
   {
-    // Promise.resolve(data).then(
-    //   data => {
-    //     console.log(data);
-    //     this.visNetworkData = data;
-    //   }
-    // );
-
+    this.visNetworkData = data;
     this.ModalIsVisible = true;
   }
 

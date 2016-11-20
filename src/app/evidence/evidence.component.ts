@@ -1,15 +1,18 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {EvidenceService} from "./evidence.service";
 import {AngularFire} from "angularfire2";
-import {ModalComponent} from "./modal.component";
+import {ModalComponent} from "../modal/modal.component";
+import {Observable} from "rxjs";
 
 @Component({
   selector: 'sh-evidence',
   templateUrl: 'evidence.html',
   styleUrls  : ['./app/evidence/evidence.css']
 })
-export class EvidenceComponent {
+
+export class EvidenceComponent implements OnInit{
   @ViewChild(ModalComponent) modal: ModalComponent;
+  private angularFire;
   private evidenceService;
   private newsItems;
   private supportKeywords;
@@ -17,8 +20,13 @@ export class EvidenceComponent {
   private clusterKeywords;
 
   constructor (es:EvidenceService, af: AngularFire) {
-    this.evidenceService   = es;
-    af.database.list('/Notifier/rated-news', {
+    this.evidenceService = es;
+    this.angularFire = af;
+  }
+
+  ngOnInit() {
+    // this.modal.visNetwork = 'test';
+    this.angularFire.database.list('/Notifier/rated-news', {
       query: {
         orderByChild: 'rank',
         limitToFirst: 5 // lets fetch 5 items
@@ -28,7 +36,6 @@ export class EvidenceComponent {
         }
       );
   }
-
 
   onSelect(item, isRadio){
     var url = isRadio?item.link:item;
@@ -47,19 +54,13 @@ export class EvidenceComponent {
   buildClusters() {
   //  ToDo: build the clusters
     var self = this;
-    this.evidenceService.clusterBuilder(this.clusterKeywords)
-      .then(data => {
-        // = data[0];
-        self.modal.showModal();
-        self.modal.visNetworkData = data[0];
-      });
     var test = {
       nodes: [
-        { id: '1', label: 'Node 1' },
-        { id: '2', label: 'Node 2' },
-        { id: '3', label: 'Node 3' },
-        { id: '4', label: 'Node 4' },
-        { id: '5', label: 'Node 5' }
+        { id: '1', label: 'comic' },
+        { id: '2', label: '0.2' },
+        { id: '3', label: '0.3' },
+        { id: '4', label: '0.4' },
+        { id: '5', label: '0.5' }
       ],
       edges: [
         { from: '1', to: '3' },
@@ -68,26 +69,10 @@ export class EvidenceComponent {
         { from: '2', to: '5' }
       ]
     };
-    // console.log('in the component test: ', {
-    //   nodes: [
-    //     { id: '1', label: 'Node 1' },
-    //     { id: '2', label: 'Node 2' },
-    //     { id: '3', label: 'Node 3' },
-    //     { id: '4', label: 'Node 4' },
-    //     { id: '5', label: 'Node 5' }
-    //   ],
-    //   edges: [
-    //     { from: '1', to: '3' },
-    //     { from: '1', to: '2' },
-    //     { from: '2', to: '4' },
-    //     { from: '2', to: '5' }
-    //   ]
-    // });
-    // self.modal.showModal(test);
-
-  }
-
-  m() {
-    // this.modal.showModal();
+    this.evidenceService.clusterBuilder(this.mainKeyword, this.clusterKeywords)
+    .then(data => {
+      // self.modal.showModal(data[0]);
+      setTimeout(function() { self.modal.showModal(data[0]); }, 7000);
+    });
   }
 }

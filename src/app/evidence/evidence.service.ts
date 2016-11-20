@@ -10,10 +10,9 @@ export class EvidenceService implements OnInit {
   private http;
   private article = '';
   private words = [];
-  private corpusSize;
   private vocabularySize;
+  private corpusSize;
   private angularFire;
-  // private IDFs = [];
   private corpus: FirebaseListObservable <any>;
   private IDFs: FirebaseListObservable <any>;
   private clusters;//: FirebaseListObservable <any>;
@@ -21,12 +20,13 @@ export class EvidenceService implements OnInit {
   constructor(http: Http, af: AngularFire) {
     this.http = http;
     this.angularFire = af;
-    this.corpus = af.database.list('Evidence/Corpus/Articles');
-    this.IDFs = af.database.list('Evidence/Corpus/IDFs');
-    // this.clusters = af.database.list('Evidence/Clusters');
+    this.corpus = af.database.list('Evidence2/Corpus/Articles');//.remove();
+    this.IDFs = af.database.list('Evidence2/Corpus/IDFs');//.remove();
   }
 
   ngOnInit() {
+    // this.corpus = this.angularFire.database.list('Evidence/Corpus/Articles');
+    // this.IDFs = this.angularFire.database.list('Evidence/Corpus/IDFs');
     // Observable.timer(100,5000).subscribe(this.wordAnalyzer);
     // Observable.timer(100,3000).subscribe(this.getArticle);
     // Observable.timer(100,2000).subscribe(this.evaluateWords);
@@ -38,21 +38,19 @@ export class EvidenceService implements OnInit {
 
   wordAnalyzer(url) {
     return this.getArticle(this.getYahooQueryUrl(url))
-      .subscribe(
-        data => {
-          this.resetCounters();
-          this.findKey(data, 'content');
-          if (this.article) {
-            this.evaluateWords( // normalizeWords
-              this.countInstances(
-                this.extractWords(this.article)
-              )
-            ).then(data => {
-              this.corpus.push({article: this.article, link: url, bag_of_words: data});
-            });
-            ;
-          }
-        });
+      .subscribe( data => {
+        this.resetCounters();
+        this.findKey(data, 'content');
+        if (this.article) {
+          this.evaluateWords( // normalizeWords
+            this.countInstances(
+              this.extractWords(this.article)
+            )
+          ).then(data => {
+            this.corpus.push({article: this.article, link: url, bag_of_words: data});
+          })
+        }
+      });
   }
 
   // instances are array of {word, count} objects
@@ -127,13 +125,12 @@ export class EvidenceService implements OnInit {
     return this.sortWords(instances);
   }
 
-  // sort the words and save them as an array of objects
+  // sort the words and save them as an array of {word, count} objects
   sortWords(instances) {
     var words = [];
     var sortedWords = Object.keys(instances).sort(function (a, b) {
       return instances[b] - instances[a]
     });
-    // // =============== convert the loop here
     sortedWords.forEach(function (word) {
       words.push({word: word, count: instances[word]});
     });
@@ -149,9 +146,9 @@ export class EvidenceService implements OnInit {
   }
 
   // 1. loop through articles
-  // 2. gather all unique words by looking into bag_of_words
+  // 2. gather all unique words by looking into bag_of_words for each article
   // 3. loop through unique words
-  // 4. find number of articles that each unique word exist in them
+  // 4. find number of articles that each unique word exists in
   // 5. calculate idf
   // 6. save IDFs as array of {word:'', number_of_docs:'', idf:''}
   saveIDFs() {
@@ -160,7 +157,6 @@ export class EvidenceService implements OnInit {
     this.corpus._ref.once("value")
       .then(snapshot => {
         this.corpusSize = snapshot.numChildren();
-
         snapshot.forEach(item => {
           item.child('bag_of_words').val().forEach(w => {
             uniqueBagOfWords.hasOwnProperty(w.word) ?
@@ -187,7 +183,6 @@ export class EvidenceService implements OnInit {
               return true;
             }
           })
-
         });
       });
   }
@@ -210,6 +205,7 @@ export class EvidenceService implements OnInit {
     // 2. Pass the link to EvidenceService for extracting contents
     // 3. Save them under corpus key for further calculation
     var keywords = this.setKeywordArray(mainKeyword, supportKeywords);
+    console.log(keywords);
     keywords.forEach((keyword: any) => {
       this.fetchLinks(keyword);
     })
@@ -219,6 +215,9 @@ export class EvidenceService implements OnInit {
     var keywords = [];
     if (supportKeywords)
       keywords = supportKeywords.split(",");
+    keywords.forEach(k => {
+      keywords.push(mainKeyword+' '+k);
+    });
     // keywords.push(mainKeyword);
     // use unshift to add an element to the beginning of an array
     keywords.unshift(mainKeyword);
@@ -248,7 +247,7 @@ export class EvidenceService implements OnInit {
       .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
   }
 
-  clusterBuilder(centers) {
+  clusterBuilder(main, centers) {
     var self = this;
     var count;
     var max;
@@ -261,7 +260,9 @@ export class EvidenceService implements OnInit {
     var flag;
     var keywords = centers.split(",");
     var records = this.corpus._ref.once("value");
-    var id = 1;
+    var id = 10;
+    nodes.push({id: 1, label: main, Title: 'Marvel'});
+
     // return Promise.all([1, 2, 3, 4, 5].map(fn)).then();
     return Promise.all(keywords.map(function (word) {
         // keywords.forEach(function (word) {
@@ -274,7 +275,7 @@ export class EvidenceService implements OnInit {
               flag = false;
               article.child('bag_of_words').val().forEach(w => {
                 if (w.word == word) count += w.count;
-                if (w.word == "Trump") flag = true;
+                if (w.word == main) flag = true;
               });
               if (flag && count > max) {
                 max = count;
@@ -286,8 +287,10 @@ export class EvidenceService implements OnInit {
             })
             currentCenterId = id++; //clusterCenters[word].id;
             nodes.push({id: currentCenterId, label: word});
+            edges.push({from: 1, to: currentCenterId});
+            console.log('first then:',clusterCenters);
             return clusterCenters;
-          })// find article with max value for Trump+word return {word:{id,bag_of_words}}
+          })
           .then(centers => {
             // console.log('=centers=>', centers);
             var i = 1;
@@ -311,22 +314,38 @@ export class EvidenceService implements OnInit {
                 observations[word].sort(function (a, b) {
                   return a['distance'] - b['distance'];
                 });
-                // console.log(observations);
-                return observations;
+                observations[word] = observations[word].slice(1,8);
+                // look into the nodes and for an element which label = word
+                // and use its id for 'from' property
+                var node = nodes.find(node => node.label === word);
+                observations[word].forEach(item => {
+                  // var duplicate = nodes.find(node => node.id === item.id);
+                  // (duplicate)
+                  //   ?((duplicate.label>item.distance)?)
+                  //   :nodes.push({id: item.id, label: item.distance + ' '+word});
+                  nodes.push({id: id /*item.id*/, label: item.distance + ' '+word});
+                  edges.push({from: node.id, to: id /*item.id*/});
+                  id++;
+                });
+                console.log(id,'word:'+word,'neighbors:',
+                  observations[word],'nodes:',nodes,'edges:',edges);
+                // return observations[word];
               })
           })// calculate distance to the centers for all articles in the corpus
           // {word: [{id,distance}]}
-          .then(data => {
-            // console.log('--------' + data[word]);
-            data[word].forEach(item => {
-              nodes.push({id: id/*item.id*/, label: item.distance});
-              edges.push({from: currentCenterId, to: id /*item.id*/});
-              id++;
-            })
-          }) //network: {nodes:[{id,label}] , edges:[{from,to}]}
-        network = {nodes: nodes, edges: edges};
-        console.log('network:',network);
-        return network;
+          // .then(data => {
+          //   console.log(id, 'word '+word+': ',
+          //     'neighbors:', data,'nodes:',nodes,'edges:',edges);
+          //   data.forEach(item => {
+          //     nodes.push({id: id/*item.id*/, label: item.distance + ' '+word});
+          //     edges.push({from: currentCenterId, to: id /*item.id*/});
+          //     id++;
+          //   });
+          // }) //network: {nodes:[{id,label}] , edges:[{from,to}]}
+      network = {nodes: nodes, edges: edges};
+      // self.clusters = {nodes: nodes, edges: edges};
+      console.log('[in service] network:', network);
+      return network;
       })
     );
   }

@@ -28,6 +28,7 @@
     <div class="panel panel-default ">
       <!-- Default panel contents -->
       <div class="panel-heading">Nominated keywords for cluster centers</div>
+      <input type="text" [(ngModel)]="mainKeyword" class="form-control" placeholder="Keyword of interest (same as corpus)">
       <input type="text" [(ngModel)]="clusterKeywords" class="form-control" placeholder="Comma separated cluster keywords">
       <button type="submit" (click)="buildClusters()" class="btn btn-default btn-block">Build Clusters</button>
     </div>
@@ -89,5 +90,15 @@
     </div>
   </div>
 </div>
-<button type="submit" (click)="m()" class="btn btn-default btn-block">M</button>
 <sh-modal></sh-modal>
+
+<!--<div class="modal-dialog">-->
+  <!--<div class="modal-body modal-content">-->
+    <!--<div class="mynetwork"-->
+         <!--[visNetwork]="visNetwork"-->
+         <!--[visNetworkData]="visNetworkData"-->
+         <!--[visNetworkOptions]="visNetworkOptions"-->
+         <!--(initialized)="networkInitialized()">-->
+    <!--</div>-->
+  <!--</div>-->
+<!--</div>-->
