@@ -16,6 +16,38 @@ export class EvidenceService implements OnInit {
   private corpus: FirebaseListObservable <any>;
   private IDFs: FirebaseListObservable <any>;
   private clusters;//: FirebaseListObservable <any>;
+  private colors = [{
+    border: '#555555',
+    background: '#BBBBBB',
+    highlight: { border: '#444444', background: '#EEEEEE' },
+    hover: { border: '#444444', background: '#EEEEEE' }
+  },{
+    border: '#777777',
+    background: '#DADADA',
+    highlight: { border: '#555555', background: '#EFEFEF' },
+    hover: { border: '#555555', background: '#EFEFEF' }
+  },{
+    border: '#CC9900',
+    background: '#FFCC00',
+    highlight: { border: '#FF9900', background: '#FFEE55' },
+    hover: { border: '#FF9900', background: '#FFEE55' }
+  },{
+    border: '#990066',
+    background: '#FF99CC',
+    highlight: { border: '#FF66CC', background: '#FFCCCC' },
+    hover: { border: '#FF66CC', background: '#FFCCCC' }
+  },{
+    border: '#666600',
+    background: '#99CC66',
+    highlight: { border: '#999900', background: '#66FF33' },
+    hover: { border: '#999900', background: '#66FF33' }
+  },{
+    border: '#2B7CE9',
+    background: '#97C2FC',
+    highlight: { border: '#2B7CE9', background: '#D2E5FF' },
+    hover: { border: '#2B7CE9', background: '#D2E5FF' }
+  }];
+
 
   constructor(http: Http, af: AngularFire) {
     this.http = http;
@@ -25,15 +57,6 @@ export class EvidenceService implements OnInit {
   }
 
   ngOnInit() {
-    // this.corpus = this.angularFire.database.list('Evidence/Corpus/Articles');
-    // this.IDFs = this.angularFire.database.list('Evidence/Corpus/IDFs');
-    // Observable.timer(100,5000).subscribe(this.wordAnalyzer);
-    // Observable.timer(100,3000).subscribe(this.getArticle);
-    // Observable.timer(100,2000).subscribe(this.evaluateWords);
-    // Observable.timer(800,2000).subscribe(this.calculateIDF);
-    // Observable.timer(800,9000).subscribe(this.countDocsWith);
-    // Observable.timer(800,500).subscribe(this.sortWords);
-    // Observable.timer(100,1000).subscribe(this.countInstances);
   }
 
   wordAnalyzer(url) {
@@ -261,7 +284,11 @@ export class EvidenceService implements OnInit {
     var keywords = centers.split(",");
     var records = this.corpus._ref.once("value");
     var id = 10;
-    nodes.push({id: 1, label: main, Title: 'Marvel'});
+    var colorIndex = 2; // index 0 belongs to the root and 1 belongs to centers
+    nodes.push({
+      id: 1, label: main, title: [main, 'This is the root', 0], font: {size:40},
+      color: this.colors[0], borderWidth: 3, borderWidthSelected: 4
+    });
 
     // return Promise.all([1, 2, 3, 4, 5].map(fn)).then();
     return Promise.all(keywords.map(function (word) {
@@ -286,8 +313,16 @@ export class EvidenceService implements OnInit {
               }
             })
             currentCenterId = id++; //clusterCenters[word].id;
-            nodes.push({id: currentCenterId, label: word});
-            edges.push({from: 1, to: currentCenterId});
+            nodes.push({
+              id: currentCenterId,
+              label: word,
+              title:[word, 'This is a cluster center', 0],
+              color: self.colors[1],
+              borderWidth: 2,
+              borderWidthSelected: 3,
+              font: {size: 28},
+            });
+            edges.push({from: 1, to: currentCenterId, width: 2});
             console.log('first then:',clusterCenters);
             return clusterCenters;
           })
@@ -299,6 +334,7 @@ export class EvidenceService implements OnInit {
                 snapshot.forEach(article => {
                   var sum = 0;
                   var d = 0;
+                  var contents = article.child('article').val();
                   centers[word].bag_of_words.forEach(k => {
                     article.child('bag_of_words').val().forEach(w => {
                       if (k.word == w.word) {
@@ -308,40 +344,63 @@ export class EvidenceService implements OnInit {
                     })
                   })
                   d = 1 - sum;
-                  observations[word].push({id: article.key, distance: d.toFixed(4)});
-                  // console.log(word, d, i++);
+                  // console.log('article contents: ',contents, 'cluster center: ',word);
+                  observations[word].push({
+                    id: article.key,
+                    distance: d.toFixed(4),
+                    link: article.child('link').val(),
+                    size: contents.split(' ').length
+                  });
                 })
                 observations[word].sort(function (a, b) {
                   return a['distance'] - b['distance'];
                 });
-                observations[word] = observations[word].slice(1,8);
+                observations[word] = observations[word].slice(0,6);
+                // console.log(observations);
                 // look into the nodes and for an element which label = word
                 // and use its id for 'from' property
                 var node = nodes.find(node => node.label === word);
                 observations[word].forEach(item => {
-                  // var duplicate = nodes.find(node => node.id === item.id);
-                  // (duplicate)
-                  //   ?((duplicate.label>item.distance)?)
-                  //   :nodes.push({id: item.id, label: item.distance + ' '+word});
-                  nodes.push({id: id /*item.id*/, label: item.distance + ' '+word});
-                  edges.push({from: node.id, to: id /*item.id*/});
+                  // console.log(
+                  //   'link: ',item.link,
+                  //   'color index: ', colorIndex,
+                  //   'color object:', self.colors[colorIndex],
+                  //   'colors: ', self.colors
+                  // );
+
+                  nodes.push({
+                    id: id /*item.id*/,
+                    label: (item.link)?item.link
+                      .replace('http://','')
+                      .replace('https://','')
+                      .replace('www.','').split("/")[0]+'\n'+item.size+' words'
+                    :'4xx', // for 404 or 400 responses
+                    title: [item.link, item.size],
+                    shadow:{ enabled: true, color: 'rgba(0,0,0,0.5)', size:11, x:3, y:3 },
+                    color: self.colors[colorIndex],
+                    shape: 'box'
+                  });
+                  edges.push({
+                    from: node.id,
+                    to: id, /*item.id*/
+                    dashes: true,
+                    label: item.distance,
+                    length: 100 + item.distance * 400,
+                    font: {
+                      color: '#777777',
+                      background: 'white',
+                      align:'middle'
+                    },
+                  });
                   id++;
                 });
+                colorIndex ++;
                 console.log(id,'word:'+word,'neighbors:',
                   observations[word],'nodes:',nodes,'edges:',edges);
                 // return observations[word];
               })
           })// calculate distance to the centers for all articles in the corpus
-          // {word: [{id,distance}]}
-          // .then(data => {
-          //   console.log(id, 'word '+word+': ',
-          //     'neighbors:', data,'nodes:',nodes,'edges:',edges);
-          //   data.forEach(item => {
-          //     nodes.push({id: id/*item.id*/, label: item.distance + ' '+word});
-          //     edges.push({from: currentCenterId, to: id /*item.id*/});
-          //     id++;
-          //   });
-          // }) //network: {nodes:[{id,label}] , edges:[{from,to}]}
+
       network = {nodes: nodes, edges: edges};
       // self.clusters = {nodes: nodes, edges: edges};
       console.log('[in service] network:', network);
@@ -349,5 +408,20 @@ export class EvidenceService implements OnInit {
       })
     );
   }
+
+  // getPoints(contents,word) {
+  //   var start, end;
+  //   var l = contents.length;
+  //   var points = [];
+  //   for(var pos = contents.indexOf(word);
+  //       pos !== -1;
+  //       pos = contents.indexOf(word, pos+1)) {
+  //     (pos < 30)? start = 0 : start = pos - 30;
+  //     (pos > l - 40)? end = l : end = pos + 40;
+  //     console.log('getPoints: ', points, pos, start, end, l);
+  //     points.push('...'+contents.substring(start,end)+'...');
+  //   }
+  //   return points;
+  // }
 }
 

@@ -72,7 +72,7 @@ export class EvidenceComponent implements OnInit{
     this.evidenceService.clusterBuilder(this.mainKeyword, this.clusterKeywords)
     .then(data => {
       // self.modal.showModal(data[0]);
-      setTimeout(function() { self.modal.showModal(data[0]); }, 7000);
+      setTimeout(function() { self.modal.showModal(data[0]); }, 15000);
     });
   }
 }
