@@ -52,8 +52,8 @@ export class EvidenceService implements OnInit {
   constructor(http: Http, af: AngularFire) {
     this.http = http;
     this.angularFire = af;
-    this.corpus = af.database.list('Evidence2/Corpus/Articles');//.remove();
-    this.IDFs = af.database.list('Evidence2/Corpus/IDFs');//.remove();
+    this.corpus = af.database.list('Evidence/Corpus/Articles');//.remove();
+    this.IDFs = af.database.list('Evidence/Corpus/IDFs');//.remove();
   }
 
   ngOnInit() {
@@ -275,24 +275,22 @@ export class EvidenceService implements OnInit {
     var count;
     var max;
     var clusterCenters = {};
+    var flag;
+    var keywords = centers.split(",");
+    var records = this.corpus._ref.once("value");
     var observations = {};
     var network = {};
     var nodes = []; //{id, label}
     var edges = []; //{from, to}
     var currentCenterId; // id
-    var flag;
-    var keywords = centers.split(",");
-    var records = this.corpus._ref.once("value");
     var id = 10;
     var colorIndex = 2; // index 0 belongs to the root and 1 belongs to centers
     nodes.push({
-      id: 1, label: main, title: [main, 'This is the root', 0], font: {size:40},
+      id: 1, label: main, title: [main, 'This is the root'], font: {size:40},
       color: this.colors[0], borderWidth: 3, borderWidthSelected: 4
     });
 
-    // return Promise.all([1, 2, 3, 4, 5].map(fn)).then();
     return Promise.all(keywords.map(function (word) {
-        // keywords.forEach(function (word) {
         observations[word] = [];
         records
           .then(snapshot => {
@@ -327,7 +325,6 @@ export class EvidenceService implements OnInit {
             return clusterCenters;
           })
           .then(centers => {
-            // console.log('=centers=>', centers);
             var i = 1;
             return records
               .then(snapshot => {
@@ -344,7 +341,6 @@ export class EvidenceService implements OnInit {
                     })
                   })
                   d = 1 - sum;
-                  // console.log('article contents: ',contents, 'cluster center: ',word);
                   observations[word].push({
                     id: article.key,
                     distance: d.toFixed(4),
@@ -356,9 +352,7 @@ export class EvidenceService implements OnInit {
                   return a['distance'] - b['distance'];
                 });
                 observations[word] = observations[word].slice(0,6);
-                // console.log(observations);
-                // look into the nodes and for an element which label = word
-                // and use its id for 'from' property
+
                 var node = nodes.find(node => node.label === word);
                 observations[word].forEach(item => {
                   // console.log(
@@ -385,7 +379,7 @@ export class EvidenceService implements OnInit {
                     to: id, /*item.id*/
                     dashes: true,
                     label: item.distance,
-                    length: 100 + item.distance * 400,
+                    length: 100 + item.distance * 1000,
                     font: {
                       color: '#777777',
                       background: 'white',

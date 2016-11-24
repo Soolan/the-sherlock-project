@@ -47,32 +47,15 @@ export class EvidenceComponent implements OnInit{
   }
 
   buildCorpus() {
-    // ToDo: build the corpus
     this.evidenceService.corpusBuilder(this.mainKeyword, this.supportKeywords);
   }
 
   buildClusters() {
-  //  ToDo: build the clusters
-    var self = this;
-    var test = {
-      nodes: [
-        { id: '1', label: 'comic' },
-        { id: '2', label: '0.2' },
-        { id: '3', label: '0.3' },
-        { id: '4', label: '0.4' },
-        { id: '5', label: '0.5' }
-      ],
-      edges: [
-        { from: '1', to: '3' },
-        { from: '1', to: '2' },
-        { from: '2', to: '4' },
-        { from: '2', to: '5' }
-      ]
-    };
+    const self = this;
     this.evidenceService.clusterBuilder(this.mainKeyword, this.clusterKeywords)
     .then(data => {
-      // self.modal.showModal(data[0]);
       setTimeout(function() { self.modal.showModal(data[0]); }, 15000);
+      // this.visNetworkService.setData("idOfYourNetwork", data);
     });
   }
 }
