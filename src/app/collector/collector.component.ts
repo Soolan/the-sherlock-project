@@ -8,9 +8,8 @@ import {AngularFire, FirebaseListObservable} from "angularfire2";
   // providers: []
 })
 export class CollectorComponent {
-  caption = "Some news worth investigating";
-  headlines;
-
+  private caption = "Some news worth investigating";
+  private headlines;
   private items: FirebaseListObservable<any>;
 
   constructor (collectorService: CollectorService, af: AngularFire) {

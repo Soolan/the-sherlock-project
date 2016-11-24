@@ -28,17 +28,17 @@ export class RatingService {
   rateNews() {
     var news = [];
     var self = this;
+    // console.log(this.news._ref.once("value"));
     // first get a reference to the value part of news object
-    this.news._ref.once("value")
-    // then loop through each news item
-      .then(snapshots => { snapshots.forEach(
-        function(snapshot) {
+    this.news.subscribe(
+      snapshots => {
+        snapshots.forEach (function (snapshot) {
           var newsRank;
           // save individual news components in a set of variables
-          var title = snapshot.child("title").val();
-          var desc = snapshot.child("description").val();
-          var date = snapshot.child("pubDate").val();
-          var link = snapshot.child("link").val();
+          var title = snapshot.title;
+          var desc = snapshot.description;
+          var date = snapshot.pubDate;
+          var link = snapshot.link;
           // calculate the news rank
           newsRank = self.rl.rateTrends(title+' '+desc) + self.rl.rateDate(date);
           // push the ranked news into an array of news objects
@@ -48,7 +48,9 @@ export class RatingService {
             'rank': newsRank,
             'link': link
           });
-        })});
+        })
+      }
+    );
     return news;
   }
 }
