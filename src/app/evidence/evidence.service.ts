@@ -291,40 +291,40 @@ export class EvidenceService implements OnInit {
     });
 
     return Promise.all(keywords.map(function (word) {
-        observations[word] = [];
-        records
-          .then(snapshot => {
-            max = 0;
-            snapshot.forEach(article => {
-              count = 0;
-              flag = false;
-              article.child('bag_of_words').val().forEach(w => {
-                if (w.word == word) count += w.count;
-                if (w.word == main) flag = true;
-              });
-              if (flag && count > max) {
-                max = count;
-                clusterCenters[word] = {
-                  id: article.key,
-                  bag_of_words: article.child('bag_of_words').val()
-                }
-              }
-            })
-            currentCenterId = id++; //clusterCenters[word].id;
-            nodes.push({
-              id: currentCenterId,
-              label: word,
-              title:[word, 'This is a cluster center', 0],
-              color: self.colors[1],
-              borderWidth: 2,
-              borderWidthSelected: 3,
-              font: {size: 28},
+      observations[word] = [];
+      records
+        .then(snapshot => {
+          max = 0;
+          snapshot.forEach(article => {
+            count = 0;
+            flag = false;
+            article.child('bag_of_words').val().forEach(w => {
+              if (w.word == word) count += w.count;
+              if (w.word == main) flag = true;
             });
-            edges.push({from: 1, to: currentCenterId, width: 2});
-            console.log('first then:',clusterCenters);
-            return clusterCenters;
+            if (flag && count > max) {
+              max = count;
+              clusterCenters[word] = {
+                id: article.key,
+                bag_of_words: article.child('bag_of_words').val()
+              }
+            }
           })
-          .then(centers => {
+          currentCenterId = id++; //clusterCenters[word].id;
+          nodes.push({
+            id: currentCenterId,
+            label: word,
+            title:[word, 'This is a cluster center', 0],
+            color: self.colors[1],
+            borderWidth: 2,
+            borderWidthSelected: 3,
+            font: {size: 28},
+          });
+          edges.push({from: 1, to: currentCenterId, width: 2});
+          console.log('first then:',clusterCenters);
+          return clusterCenters;
+        })
+        .then(centers => {
             var i = 1;
             return records
               .then(snapshot => {
@@ -399,23 +399,7 @@ export class EvidenceService implements OnInit {
       // self.clusters = {nodes: nodes, edges: edges};
       console.log('[in service] network:', network);
       return network;
-      })
-    );
+    }));
   }
-
-  // getPoints(contents,word) {
-  //   var start, end;
-  //   var l = contents.length;
-  //   var points = [];
-  //   for(var pos = contents.indexOf(word);
-  //       pos !== -1;
-  //       pos = contents.indexOf(word, pos+1)) {
-  //     (pos < 30)? start = 0 : start = pos - 30;
-  //     (pos > l - 40)? end = l : end = pos + 40;
-  //     console.log('getPoints: ', points, pos, start, end, l);
-  //     points.push('...'+contents.substring(start,end)+'...');
-  //   }
-  //   return points;
-  // }
 }
 
