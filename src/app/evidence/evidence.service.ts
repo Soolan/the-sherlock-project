@@ -15,7 +15,7 @@ export class EvidenceService implements OnInit {
   private angularFire;
   private corpus: FirebaseListObservable <any>;
   private IDFs: FirebaseListObservable <any>;
-  private clusters;//: FirebaseListObservable <any>;
+  private clusters;
   private colors = [{
     border: '#555555',
     background: '#BBBBBB',
@@ -321,7 +321,6 @@ export class EvidenceService implements OnInit {
             font: {size: 28},
           });
           edges.push({from: 1, to: currentCenterId, width: 2});
-          console.log('first then:',clusterCenters);
           return clusterCenters;
         })
         .then(centers => {
@@ -363,13 +362,15 @@ export class EvidenceService implements OnInit {
                   // );
 
                   nodes.push({
-                    id: id /*item.id*/,
+                    id: id /*item.id won't work here. Because it should be unique and
+                    chances are it won't be. (An article - depend on the distance - can
+                    apper in two or more clusters.)*/,
                     label: (item.link)?item.link
                       .replace('http://','')
                       .replace('https://','')
                       .replace('www.','').split("/")[0]+'\n'+item.size+' words'
                     :'4xx', // for 404 or 400 responses
-                    title: [item.link, item.size],
+                    title: [item.link, item.id],
                     shadow:{ enabled: true, color: 'rgba(0,0,0,0.5)', size:11, x:3, y:3 },
                     color: self.colors[colorIndex],
                     shape: 'box'
@@ -396,7 +397,7 @@ export class EvidenceService implements OnInit {
           })// calculate distance to the centers for all articles in the corpus
 
       network = {nodes: nodes, edges: edges};
-      // self.clusters = {nodes: nodes, edges: edges};
+
       console.log('[in service] network:', network);
       return network;
     }));

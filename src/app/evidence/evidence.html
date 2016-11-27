@@ -1,30 +1,30 @@
 <div class="container">
   <div class="col-md-5">
-    <!--<div class="panel panel-default ">-->
-      <!--&lt;!&ndash; Default panel contents &ndash;&gt;-->
-      <!--<div class="panel-heading">Available News Items</div>-->
-      <!--<ul class="list-unstyled">-->
-        <!--<li *ngFor="let item of newsItems">-->
-          <!--<div class="media-right">-->
-            <!--<input type="radio" name="news" (click)="onSelect(item, true)">-->
-            <!--{{item.title}} <a href="{{item.link}}">(read more)</a> <br>-->
-          <!--</div>-->
-        <!--</li>-->
-      <!--</ul>-->
-      <!--<div class="input-group">-->
-        <!--<input type="text" class="form-control" #url placeholder="other news/article url...">-->
-        <!--<span class="input-group-btn">-->
-          <!--<button class="btn btn-default" type="button" (click)="onSelect(url.value, false)">Go!</button>-->
-        <!--</span>-->
-      <!--</div>&lt;!&ndash; /input-group &ndash;&gt;-->
-    <!--</div>-->
-    <!--<div class="panel panel-default ">-->
-      <!--&lt;!&ndash; Default panel contents &ndash;&gt;-->
-      <!--<div class="panel-heading">Nominated keywords for corpus</div>-->
-      <!--<input type="text" [(ngModel)]="supportKeywords" class="form-control" placeholder="Comma separated support keywords">-->
-      <!--<input type="text" [(ngModel)]="mainKeyword" class="form-control" placeholder="Keyword of interest">-->
-      <!--<button type="submit" (click)="buildCorpus()" class="btn btn-default btn-block">Fetch Articles For Corpus</button>-->
-    <!--</div>-->
+    <div class="panel panel-default ">
+      <!-- Default panel contents -->
+      <div class="panel-heading">Available News Items</div>
+      <ul class="list-unstyled">
+        <li *ngFor="let item of newsItems">
+          <div class="media-right">
+            <input type="radio" name="news" (click)="onSelect(item, true)">
+            {{item.title}} <a href="{{item.link}}">(read more)</a> <br>
+          </div>
+        </li>
+      </ul>
+      <div class="input-group">
+        <input type="text" class="form-control" #url placeholder="other news/article url...">
+        <span class="input-group-btn">
+          <button class="btn btn-default" type="button" (click)="onSelect(url.value, false)">Go!</button>
+        </span>
+      </div><!-- /input-group -->
+    </div>
+    <div class="panel panel-default ">
+      <!-- Default panel contents -->
+      <div class="panel-heading">Nominated keywords for corpus</div>
+      <input type="text" [(ngModel)]="supportKeywords" class="form-control" placeholder="Comma separated support keywords">
+      <input type="text" [(ngModel)]="mainKeyword" class="form-control" placeholder="Keyword of interest">
+      <button type="submit" (click)="buildCorpus()" class="btn btn-default btn-block">Fetch Articles For Corpus</button>
+    </div>
     <div class="panel panel-default ">
       <!-- Default panel contents -->
       <div class="panel-heading">Nominated keywords for cluster centers</div>
