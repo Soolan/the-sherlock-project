@@ -1,0 +1,138 @@
+<div class="container">
+  <ul class="nav nav-tabs">
+    <li role="presentation" class="active"><a href="#"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span></a>
+    </li>
+    <li role="presentation"><a href="#">report 1</a></li>
+    <li role="presentation"><a href="#">report 2</a></li>
+  </ul>
+  <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+    <div class="panel panel-default">
+      <div class="panel-heading" role="tab" id="headingOne">
+        <h4 class="panel-title">
+          <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true"
+             aria-controls="collapseOne">
+            report 1
+          </a>
+          <button _ngcontent-slb-6="" class="btn btn-default btn-xs pull-right" type="button">
+            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+          </button>
+        </h4>
+
+      </div>
+      <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+        <div class="panel-body">
+          <form>
+            <div class="row">
+              <div class="col-md-5">
+                <label>General settings</label>
+                <div class="well well-sm">
+                  <label>
+                    Template name: <input type="text" class="input-sm">
+                  </label>
+                  <br>
+                  <label>
+                    Show:
+                  </label>
+                  <label class="checkbox-inline">
+                    <input type="checkbox" value="">Corpus Size
+                  </label>
+                  <label class="checkbox-inline">
+                    <input type="checkbox" value="">Vocabulary Size
+                  </label>
+                  <label class="checkbox-inline">
+                    <input type="checkbox" value="">Print Button
+                  </label>
+                </div>
+
+                <label>Corpus settings</label>
+                <div class="well well-sm">
+                  <label>
+                    Top <input type="text" size="1" class="input-sm"> frequent words in the Corpus
+                  </label>
+                  <br>
+                  <label>
+                    Top <input type="text" size="1" class="input-sm"> IDFs in the Corpus
+                  </label>
+                  <br>
+                  <label>
+                    Article stats:
+                  </label>
+                  <label class="checkbox-inline">
+                    <input type="checkbox" value="">Longest
+                  </label>
+                  <label class="checkbox-inline">
+                    <input type="checkbox" value="">Avg. Size
+                  </label>
+                  <label class="checkbox-inline">
+                    <input type="checkbox" value="">Shortest
+                  </label>
+                </div>
+              </div>
+              <div class="col-md-7">
+                <label>Cluster settings</label>
+                <div class="well well-sm">
+                  <label>
+                    Show graph for:
+                  </label>
+                  <label class="checkbox-inline">
+                    <input type="checkbox" value="">Root node (Main Keyword)
+                  </label>
+                  <label class="checkbox-inline">
+                    <input type="checkbox" value="">Cluster centers
+                  </label>
+                  <label class="checkbox-inline">
+                    <input type="checkbox" value="">Article nodes
+                  </label>
+                  <br>
+                  <label>
+                    Article stats:
+                  </label>
+                  <label class="checkbox-inline">
+                    <input type="checkbox" value="">Article size
+                  </label>
+                  <label class="checkbox-inline">
+                    <input type="checkbox" value="">Distance from cluster center
+                  </label>
+                  <label class="checkbox-inline">
+                    <input type="checkbox" value="">URL
+                  </label>
+                  <hr>
+                  <label>
+                    List of <input type="text" size="1" class="input-sm"> phrases in the article which contain the root node (Main Keyword)
+                  </label>
+                  <br>
+                  <label>
+                    List of <input type="text" size="1" class="input-sm"> phrases in the article which contain the cluster center
+                  </label>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-heading" role="tab" id="headingTwo">
+        <h4 class="panel-title">
+          <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo"
+             aria-expanded="false" aria-controls="collapseTwo">
+            report 2
+          </a>
+        </h4>
+      </div>
+      <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+        <div class="panel-body">
+          Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon
+          officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf
+          moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim
+          keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur
+          butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably
+          haven't heard of them accusamus labore sustainable VHS.
+        </div>
+      </div>
+    </div>
+    <button type="button" class="btn btn-default">
+      <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+    </button>
+  </div>
+</div>

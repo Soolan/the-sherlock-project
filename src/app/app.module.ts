@@ -21,6 +21,7 @@ import {EvidenceService} from "./evidence/evidence.service";
 import {AiComponent} from './ai/ai.component';
 import {VisModule} from 'ng2-vis';
 import {ModalComponent} from './modal/modal.component';
+import {ReportComponent} from "./report/report.component";
 
 export const firebaseConfig = {
   apiKey: "AIzaSyA8C9a7wZ9r-5BsMXJbP3-6_raliTVkHpk",
@@ -51,7 +52,7 @@ export const timeSpans = [
   declarations: [
     AppComponent, NavigationComponent, CollectorComponent,
     RatingComponent, NotifierComponent, EvidenceComponent,
-    AiComponent, OrderByPipe, ModalComponent
+    AiComponent, OrderByPipe, ModalComponent, ReportComponent
   ],
   schemas     : [CUSTOM_ELEMENTS_SCHEMA],
   imports     : [

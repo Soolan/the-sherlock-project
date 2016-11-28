@@ -54,8 +54,8 @@ export class EvidenceService implements OnInit {
   constructor(http: Http, af: AngularFire) {
     this.http = http;
     this.angularFire = af;
-    this.corpus = af.database.list('Evidence2/Corpus/Articles');//.remove();
-    this.IDFs = af.database.list('Evidence2/Corpus/IDFs');//.remove();
+    this.corpus = af.database.list('Evidence/Corpus/Articles');//.remove();
+    this.IDFs = af.database.list('Evidence/Corpus/IDFs');//.remove();
   }
 
   ngOnInit() {
@@ -82,13 +82,15 @@ export class EvidenceService implements OnInit {
   evaluateWords(instances) {
     var self = this;
     var normFactor = this.calculateNorm(instances);
-    return Promise.all(instances.map(function (w) {
-      if (w.word.length < 20) {
+    return Promise.all(instances
+      .filter(function(w) { //better way to weed out nonsense long words
+        return w.word.length < 20;
+      })
+      .map(function (w) {
         var normalized = w.count / normFactor;
         w['normalized'] = normalized.toFixed(4);
         self.words.push(w);
-      }
-      return w;
+        return w;
     }));
   }
 
@@ -178,9 +180,11 @@ export class EvidenceService implements OnInit {
         this.corpusSize = snapshot.numChildren();
         snapshot.forEach(item => {
           item.child('bag_of_words').val().forEach(w => {
-            uniqueBagOfWords.hasOwnProperty(w.word) ?
-              uniqueBagOfWords[w.word]++ :
-              uniqueBagOfWords[w.word] = 1;
+            if (w.word.length < 20) {
+              uniqueBagOfWords.hasOwnProperty(w.word) ?
+                uniqueBagOfWords[w.word]++ :
+                uniqueBagOfWords[w.word] = 1;
+            }
           });
         });
 
@@ -220,7 +224,7 @@ export class EvidenceService implements OnInit {
     // shortest article link + word count + unique words
     // main keyword
     // cluster centers
-    // articles for each center: no. of words + link + distance
+    // articles for each center: no. of words + link + distance + summary (lets say 10 bullets)
     this.IDFs._ref.orderByChild("IDF")
       .startAt(4)/*.endAt(20)*/.limitToLast(300).once("value")
       .then(snapshot => {
