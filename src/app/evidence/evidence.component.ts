@@ -46,6 +46,9 @@ export class EvidenceComponent implements OnInit{
   onIDFs() {
     this.evidenceService.saveIDFs();
   }
+  onSummary() {
+    this.evidenceService.summaryTest();
+  }
 
   buildCorpus() {
     this.evidenceService.corpusBuilder(this.mainKeyword, this.supportKeywords);

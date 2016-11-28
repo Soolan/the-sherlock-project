@@ -2,7 +2,7 @@ import {Injectable, OnInit} from "@angular/core";
 import forEach = require("core-js/fn/array/for-each");
 import {Response, Http} from "@angular/http";
 import {Observable} from "rxjs";
-import {AngularFire, FirebaseListObservable} from "angularfire2";
+import {AngularFire, FirebaseListObservable, FirebaseObjectObservable} from "angularfire2";
 import {googleSearchConfig, timeSpans} from "../app.module";
 
 @Injectable()
@@ -15,6 +15,8 @@ export class EvidenceService implements OnInit {
   private angularFire;
   private corpus: FirebaseListObservable <any>;
   private IDFs: FirebaseListObservable <any>;
+  private summary: FirebaseObjectObservable <any>;
+  private sumTest = [];
   private clusters;
   private colors = [{
     border: '#555555',
@@ -52,8 +54,8 @@ export class EvidenceService implements OnInit {
   constructor(http: Http, af: AngularFire) {
     this.http = http;
     this.angularFire = af;
-    this.corpus = af.database.list('Evidence/Corpus/Articles');//.remove();
-    this.IDFs = af.database.list('Evidence/Corpus/IDFs');//.remove();
+    this.corpus = af.database.list('Evidence2/Corpus/Articles');//.remove();
+    this.IDFs = af.database.list('Evidence2/Corpus/IDFs');//.remove();
   }
 
   ngOnInit() {
@@ -168,12 +170,6 @@ export class EvidenceService implements OnInit {
       "&format=json&diagnostics=true&callback=";
   }
 
-  // 1. loop through articles
-  // 2. gather all unique words by looking into bag_of_words for each article
-  // 3. loop through unique words
-  // 4. find number of articles that each unique word exists in
-  // 5. calculate idf
-  // 6. save IDFs as array of {word:'', number_of_docs:'', idf:''}
   saveIDFs() {
     var uniqueBagOfWords = {};
     this.IDFs.remove();
@@ -187,7 +183,12 @@ export class EvidenceService implements OnInit {
               uniqueBagOfWords[w.word] = 1;
           });
         });
-        var words = Object.keys(uniqueBagOfWords);
+
+        var words = Object.keys(uniqueBagOfWords)
+          // lets sort them based on their occurance
+          .sort(function (a, b) {
+            return uniqueBagOfWords[b] - uniqueBagOfWords[a]
+          });
         this.vocabularySize = words.length;
         words.forEach(word => {
           var idf = Math.abs(Math.log2(
@@ -210,6 +211,74 @@ export class EvidenceService implements OnInit {
       });
   }
 
+  summaryTest() {
+    // corpus size
+    // vocabulary
+    // top 10 frequent words in the corpus
+    // top 10 words with highest IDF
+    // longest article link + word count + unique words
+    // shortest article link + word count + unique words
+    // main keyword
+    // cluster centers
+    // articles for each center: no. of words + link + distance
+    this.IDFs._ref.orderByChild("IDF")
+      .startAt(4)/*.endAt(20)*/.limitToLast(300).once("value")
+      .then(snapshot => {
+        snapshot.forEach(item => {
+          this.sumTest.push({
+            docs:item.child('doc_with_word').val(),
+            word:item.child('word').val(),
+            idf:item.child('IDF').val()
+          })
+        });
+      });
+  }
+  // Print solution (open this)
+  /*
+<!DOCTYPE html>
+ <html>
+
+ <head>
+ <meta charset="utf-8" />
+ <title>AngularJS Print Directive of html templates </title>
+ <link rel="stylesheet" href="style.css" />
+ <script src="https://code.angularjs.org/1.4.1/angular.js"></script>
+ <script>
+ var app = angular.module('myApp', []);
+
+ app.controller('myCtrl', function($scope) {
+ $scope.printToCart = function(printSectionId) {
+ var innerContents = document.getElementById(printSectionId).innerHTML;
+ var popupWinindow = window.open('', '_blank', 'width=600,height=700,scrollbars=no,menubar=no,toolbar=no,location=no,status=no,titlebar=no');
+ popupWinindow.document.open();
+ popupWinindow.document.write('<html><head><link rel="stylesheet" type="text/css" href="style.css" /></head><body onload="window.print()">' + innerContents + '</html>');
+ popupWinindow.document.close();
+ }
+ });
+ </script>
+ </head>
+
+ <body id="printSectionId" ng-app="myApp">
+ <div ng-controller="myCtrl">
+ <h1>AngularJS Print html templates</h1>
+ <form novalidate>
+ First Name:
+ <input type="text" ng-model="firstName" class="tb8">
+ <br>
+ <br> Last Name:
+ <input type="text" ng-model="lastName" class="tb8">
+ <br>
+ <br>
+ <button ng-click="Submit()" class="button">Submit</button>
+ <button ng-click="printToCart('printSectionId')" class="button">Print</button>
+ </form>
+ </div>
+ <div>
+ <br/>
+ <br/><a href="http://www.code-sample.com/2015/07/angularjs-2-forms-validation.html" target="_blank">More About AngularJS Print...</a></div>
+ </body>
+
+ </html>*/
   getIDF(word, IDFs) {
     var idf = 0;
     IDFs.some((item: any) => {
