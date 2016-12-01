@@ -58,7 +58,6 @@ export class EvidenceComponent implements OnInit{
     const self = this;
     this.evidenceService.clusterBuilder(this.mainKeyword, this.clusterKeywords)
     .then(data => {
-
       setTimeout(function() {
         self.network.set(data[0]);
         self.modal.showModal(data[0]);
