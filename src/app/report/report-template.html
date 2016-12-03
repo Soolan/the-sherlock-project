@@ -1,10 +1,11 @@
 <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
   <div class="panel panel-default">
-    <div class="panel-heading" role="tab" id="headingTwo">
+    <div class="panel-heading" role="tab" id="{{model.$key}}" >
       <h4 class="panel-title">
         <a role="button" data-toggle="collapse" data-parent="#accordion"
-           href="#collapseTwo" aria-expanded="true"
-           aria-controls="collapseTwo">
+           href="#collapse{{model.$key}}" aria-expanded="true"
+           [attr.aria-controls]="'collapse'+model.$key">
+           <!--aria-controls="collapseTwo">-->
           {{model.templateName}}
         </a>
         <button class="btn btn-default btn-xs pull-right" type="button">
@@ -13,12 +14,14 @@
         <button class="btn btn-default btn-xs pull-right" type="submit">
           <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>
         </button>
-
       </h4>
     </div>
-    <div id="collapseTwo" class="panel-collapse collapse in" role="tabpanel"
-         aria-labelledby="headingTwo">
-      <div class="panel-body">
+    <div id="collapse{{model.$key}}" class="panel-collapse collapse" role="tabpanel"
+         [attr.aria-labelledby]="model.$key">
+
+         <!--aria-labelledby="headingTwo">-->
+
+    <div class="panel-body">
         <form>
           <div class="row">
             <div class="col-md-5">
@@ -119,117 +122,4 @@
       </div>
     </div>
   </div>
-
-  <button type="button" class="btn btn-default">
-    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-  </button>
 </div>
-
-
-<!--<div class="panel panel-default">-->
-  <!--<div class="panel-heading" role="tab" id="headingOne">-->
-    <!--<h4 class="panel-title">-->
-      <!--<a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true"-->
-         <!--aria-controls="collapseOne">-->
-        <!--report 1-->
-      <!--</a>-->
-      <!--<button class="btn btn-default btn-xs pull-right" type="button">-->
-        <!--<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>-->
-      <!--</button>-->
-    <!--</h4>-->
-
-  <!--</div>-->
-  <!--<div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">-->
-    <!--<div class="panel-body">-->
-      <!--<form>-->
-        <!--<div class="row">-->
-          <!--<div class="col-md-5">-->
-            <!--<label>General settings</label>-->
-            <!--<div class="well well-sm">-->
-              <!--<label>-->
-                <!--Template name: <input type="text" class="input-sm">-->
-              <!--</label>-->
-              <!--<br>-->
-              <!--<label>-->
-                <!--Show:-->
-              <!--</label>-->
-              <!--<label class="checkbox-inline">-->
-                <!--<input type="checkbox" value="">Corpus Size-->
-              <!--</label>-->
-              <!--<label class="checkbox-inline">-->
-                <!--<input type="checkbox" value="">Vocabulary Size-->
-              <!--</label>-->
-              <!--<label class="checkbox-inline">-->
-                <!--<input type="checkbox" value="">Print Button-->
-              <!--</label>-->
-            <!--</div>-->
-
-            <!--<label>Corpus settings</label>-->
-            <!--<div class="well well-sm">-->
-              <!--<label>-->
-                <!--Top <input type="text" size="1" class="input-sm"> frequent words in the Corpus-->
-              <!--</label>-->
-              <!--<br>-->
-              <!--<label>-->
-                <!--Top <input type="text" size="1" class="input-sm"> IDFs in the Corpus-->
-              <!--</label>-->
-              <!--<br>-->
-              <!--<label>-->
-                <!--Article stats:-->
-              <!--</label>-->
-              <!--<label class="checkbox-inline">-->
-                <!--<input type="checkbox" value="">Longest-->
-              <!--</label>-->
-              <!--<label class="checkbox-inline">-->
-                <!--<input type="checkbox" value="">Avg. Size-->
-              <!--</label>-->
-              <!--<label class="checkbox-inline">-->
-                <!--<input type="checkbox" value="">Shortest-->
-              <!--</label>-->
-            <!--</div>-->
-          <!--</div>-->
-          <!--<div class="col-md-7">-->
-            <!--<label>Cluster settings</label>-->
-            <!--<div class="well well-sm">-->
-              <!--<label>-->
-                <!--Show graph for:-->
-              <!--</label>-->
-              <!--<label class="checkbox-inline">-->
-                <!--<input type="checkbox" value="">Root node (Main Keyword)-->
-              <!--</label>-->
-              <!--<label class="checkbox-inline">-->
-                <!--<input type="checkbox" value="">Cluster centers-->
-              <!--</label>-->
-              <!--<label class="checkbox-inline">-->
-                <!--<input type="checkbox" value="">Article nodes-->
-              <!--</label>-->
-              <!--<br>-->
-              <!--<label>-->
-                <!--Article stats:-->
-              <!--</label>-->
-              <!--<label class="checkbox-inline">-->
-                <!--<input type="checkbox" value="">Article size-->
-              <!--</label>-->
-              <!--<label class="checkbox-inline">-->
-                <!--<input type="checkbox" value="">Distance from cluster center-->
-              <!--</label>-->
-              <!--<label class="checkbox-inline">-->
-                <!--<input type="checkbox" value="">URL-->
-              <!--</label>-->
-              <!--<hr>-->
-              <!--<label>-->
-                <!--List of <input type="text" size="1" class="input-sm"> phrases in the article which contain the root-->
-                <!--node (Main Keyword)-->
-              <!--</label>-->
-              <!--<br>-->
-              <!--<label>-->
-                <!--List of <input type="text" size="1" class="input-sm"> phrases in the article which contain the cluster-->
-                <!--center-->
-              <!--</label>-->
-            <!--</div>-->
-          <!--</div>-->
-        <!--</div>-->
-      <!--</form>-->
-    <!--</div>-->
-  <!--</div>-->
-<!--</div>-->

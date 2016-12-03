@@ -1,9 +1,25 @@
 <div class="container">
   <ul class="nav nav-tabs">
-    <li role="presentation" class="active"><a href="#"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span></a>
+    <li class="active">
+      <a data-toggle="tab" href="#config">
+        <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+      </a>
     </li>
-    <li role="presentation"><a href="#">report 1</a></li>
-    <li role="presentation"><a href="#">report 2</a></li>
+    <li><a data-toggle="tab" href="#report1">report 1</a></li>
   </ul>
-  <sh-report-template [templates]="templates"></sh-report-template>
+  <div class="tab-content">
+    <div id="config" class="tab-pane fade in active">
+      <sh-report-template *ngFor="let template of items"
+                          [template]="template"
+                          (onNewReport)="onNewReport($event)">
+      </sh-report-template>
+      <button type="button" class="btn btn-default" (click)="newReport()">
+        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+      </button>
+    </div>
+    <div id="report1" class="tab-pane fade">
+      <h3>Report 1</h3>
+      <p>Some content in report 1.</p>
+    </div>
+  </div>
 </div>
