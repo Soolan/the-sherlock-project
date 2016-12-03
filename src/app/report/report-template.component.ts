@@ -7,18 +7,16 @@ import {ReportConfig} from "./report.config";
 })
 export class ReportTemplateComponent {
   @Input('template') model: ReportConfig;
-  private headingId = 'myId';
-  constructor () {
-    // console.log(this.ids);
-    // console.log(template);
-  }
-  // private headingId = this.model.$key;
-  // private collapseId;
-  // @Output() onNewReport = new EventEmitter<ReportConfig>();
+  @Output() onSaveReportTemplate = new EventEmitter<any>();
+  @Output() onDeleteReportTemplate = new EventEmitter<any>();
 
-  // newReport() {
-  //   this.onNewReport.emit( new ReportConfig('untitled', false,
-  //     false, false, 0, 0, false, false, false, false, false,
-  //     {show:true, size:false, distance:false, url:false}, 0, 0));
-  // }
+  constructor () {}
+
+  saveReportTemplate(model) {
+    this.onSaveReportTemplate.emit(model);
+  }
+
+  deleteReportTemplate(model) {
+    this.onDeleteReportTemplate.emit(model);
+  }
 }

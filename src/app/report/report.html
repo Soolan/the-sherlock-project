@@ -5,21 +5,21 @@
         <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
       </a>
     </li>
-    <li><a data-toggle="tab" href="#report1">report 1</a></li>
+    <li *ngFor="let report of items"><a data-toggle="tab" href="#{{report.$key}}">{{report.templateName}}</a></li>
   </ul>
   <div class="tab-content">
     <div id="config" class="tab-pane fade in active">
       <sh-report-template *ngFor="let template of items"
                           [template]="template"
-                          (onNewReport)="onNewReport($event)">
+                          (onSaveReportTemplate)="onSaveReportTemplate($event)"
+                          (onDeleteReportTemplate)="onDeleteReportTemplate($event)">
       </sh-report-template>
-      <button type="button" class="btn btn-default" (click)="newReport()">
+      <button type="button" class="btn btn-default" (click)="newReportTemplate()">
         <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
       </button>
     </div>
-    <div id="report1" class="tab-pane fade">
-      <h3>Report 1</h3>
-      <p>Some content in report 1.</p>
+    <div *ngFor="let report of items" id="{{report.$key}}" class="tab-pane fade">
+      <p>place holder for {{report.templateName}}</p>
     </div>
   </div>
 </div>

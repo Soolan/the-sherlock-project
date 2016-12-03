@@ -1,27 +1,26 @@
 <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
   <div class="panel panel-default">
-    <div class="panel-heading" role="tab" id="{{model.$key}}" >
+    <div class="panel-heading" role="tab" id="heading{{model.$key}}">
       <h4 class="panel-title">
         <a role="button" data-toggle="collapse" data-parent="#accordion"
            href="#collapse{{model.$key}}" aria-expanded="true"
            [attr.aria-controls]="'collapse'+model.$key">
-           <!--aria-controls="collapseTwo">-->
+          <!--aria-controls="collapseTwo">-->
           {{model.templateName}}
         </a>
-        <button class="btn btn-default btn-xs pull-right" type="button">
+        <button class="btn btn-default btn-xs pull-right" type="button"
+                (click)="deleteReportTemplate(model)">
           <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
         </button>
-        <button class="btn btn-default btn-xs pull-right" type="submit">
+        <button class="btn btn-default btn-xs pull-right" type="submit"
+                (click)="saveReportTemplate(model)">
           <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>
         </button>
       </h4>
     </div>
     <div id="collapse{{model.$key}}" class="panel-collapse collapse" role="tabpanel"
-         [attr.aria-labelledby]="model.$key">
-
-         <!--aria-labelledby="headingTwo">-->
-
-    <div class="panel-body">
+         [attr.aria-labelledby]="'heading'+model.$key">
+      <div class="panel-body">
         <form>
           <div class="row">
             <div class="col-md-5">

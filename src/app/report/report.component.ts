@@ -12,7 +12,7 @@ export class ReportComponent implements OnInit {
   private templates: FirebaseListObservable<any>;
   private items = [];
   private angularFire;
-  private newsItems;
+  private reports = [];
   private reportService;
 
   constructor(/*rs:ReportService, */af: AngularFire) {
@@ -33,17 +33,24 @@ export class ReportComponent implements OnInit {
       });
   }
 
-  newReport() {
+  newReportTemplate() {
     this.templates.push( new ReportConfig('untitled333', false,
         false, false, 0, 0, false, false, false, false, false,
         {show:true, size:false, distance:false, url:false}, 0, 0)
     );
   }
 
-  // onNewReport( report: ReportConfig) {
-  //   console.log(report);
-  //   this.templates.push(report);
-  // }
+  onSaveReportTemplate(report) {
+    // console.log(report);
+    var key = report.$key;
+    delete report.$key;
+    delete report.$exists;
+    this.templates.update(key, report);
+  }
+
+  onDeleteReportTemplate(report) {
+    this.templates.remove(report.$key);
+  }
 
   // 1. read templates from db
   // 2. save them in an array
