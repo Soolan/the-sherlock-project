@@ -19,7 +19,8 @@
       </button>
     </div>
     <div *ngFor="let report of items" id="{{report.$key}}" class="tab-pane fade">
-      <p>place holder for {{report.templateName}}</p>
+      <!--<p>place holder for {{report.templateName}}</p>-->
+      <sh-report-general [general]="general"></sh-report-general>
     </div>
   </div>
 </div>

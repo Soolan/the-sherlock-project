@@ -23,6 +23,7 @@ import {VisModule} from 'ng2-vis';
 import {ModalComponent} from './modal/modal.component';
 import {ReportComponent} from "./report/report.component";
 import {ReportTemplateComponent} from "./report/report-template.component";
+import {ReportGeneralComponent} from "./report/report-general.component";
 
 export const firebaseConfig = {
   apiKey: "AIzaSyA8C9a7wZ9r-5BsMXJbP3-6_raliTVkHpk",
@@ -54,7 +55,7 @@ export const timeSpans = [
     AppComponent, NavigationComponent, CollectorComponent,
     RatingComponent, NotifierComponent, EvidenceComponent,
     AiComponent, OrderByPipe, ModalComponent, ReportComponent,
-    ReportTemplateComponent
+    ReportTemplateComponent, ReportGeneralComponent
   ],
   schemas     : [CUSTOM_ELEMENTS_SCHEMA],
   imports     : [

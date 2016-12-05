@@ -1,5 +1,4 @@
 import {Component, OnInit} from '@angular/core';
-import {ReportTemplateComponent} from './report-template.component';
 import {FirebaseListObservable, AngularFire} from "angularfire2";
 import {ReportConfig} from "./report.config";
 
@@ -13,6 +12,7 @@ export class ReportComponent implements OnInit {
   private items = [];
   private angularFire;
   private reports = [];
+  private general = ['MARS','540', '15000'];
   private reportService;
 
   constructor(/*rs:ReportService, */af: AngularFire) {
