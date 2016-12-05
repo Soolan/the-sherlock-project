@@ -12,7 +12,14 @@ export class ReportComponent implements OnInit {
   private items = [];
   private angularFire;
   private reports = [];
-  private general = ['MARS','540', '15000'];
+  private general = {mainKeyword:'MARS', corpusSize:'540', vocabularySize:'15000'};
+  private corpus = {
+    topFreqs: [{word:'w1', reps:10}, {word:'w2', reps:9}],
+    topIDFs: [{word:'w1', idf:0.4}, {word:'w2', idf:0.3}],
+    biggestArticle: {size:3000, link:'http://www.test.com'},
+    smallestArticle: {size:50, link:'http://www.test.com'},
+    averageSize: 750
+  };
   private reportService;
 
   constructor(/*rs:ReportService, */af: AngularFire) {

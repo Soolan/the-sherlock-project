@@ -1,0 +1,81 @@
+.corpus {
+  margin-top: 20px;
+}
+
+#talkbubble1 {
+  margin-top: 20px;
+  width: 290px;
+  height: 150px;
+  background: #ffc537;
+  background: -webkit-linear-gradient(left, #ffc537, #cbcbcb); /* For Safari 5.1 to 6.0 */
+  background: -o-linear-gradient(right, #ffc537, #cbcbcb); /* For Opera 11.1 to 12.0 */
+  background: -moz-linear-gradient(right, #ffc537, #cbcbcb); /* For Firefox 3.6 to 15 */
+  background: linear-gradient(right, #ffc537, #cbcbcb); /* Standard syntax */
+  position: relative;
+  -moz-border-radius:    10px;
+  -webkit-border-radius: 10px;
+  border-radius:         10px;
+}
+#talkbubble1:before {
+  content:"";
+  position: absolute;
+  right: 100%;
+  top: 40px;
+  width: 0;
+  height: 0;
+  border-top: 35px solid transparent;
+  border-right: 25px solid #ffc537;
+  border-bottom: 35px solid transparent;
+}
+
+#talkbubble2 {
+  margin-top: 20px;
+  width: 290px;
+  height: 150px;
+  background: #ffc537;
+  background: -webkit-linear-gradient(left, #ffc537, #cbcbcb); /* For Safari 5.1 to 6.0 */
+  background: -o-linear-gradient(right, #ffc537, #cbcbcb); /* For Opera 11.1 to 12.0 */
+  background: -moz-linear-gradient(right, #ffc537, #cbcbcb); /* For Firefox 3.6 to 15 */
+  background: linear-gradient(right, #ffc537, #cbcbcb); /* Standard syntax */
+  position: relative;
+  -moz-border-radius:    10px;
+  -webkit-border-radius: 10px;
+  border-radius:         10px;
+}
+#talkbubble2:before {
+  content:"";
+  position: absolute;
+  right: 100%;
+  top: 40px;
+  width: 0;
+  height: 0;
+  border-top: 35px solid transparent;
+  border-right: 25px solid #ffc537;
+  border-bottom: 35px solid transparent;
+}
+
+#talkbubble3 {
+  margin-top: 20px;
+  width: 290px;
+  height: 150px;
+  background: #ffc537;
+  background: -webkit-linear-gradient(left, #ffc537, #cbcbcb); /* For Safari 5.1 to 6.0 */
+  background: -o-linear-gradient(right, #ffc537, #cbcbcb); /* For Opera 11.1 to 12.0 */
+  background: -moz-linear-gradient(right, #ffc537, #cbcbcb); /* For Firefox 3.6 to 15 */
+  background: linear-gradient(right, #ffc537, #cbcbcb); /* Standard syntax */
+  position: relative;
+  -moz-border-radius:    10px;
+  -webkit-border-radius: 10px;
+  border-radius:         10px;
+}
+#talkbubble3:before {
+  content:"";
+  position: absolute;
+  right: 100%;
+  top: 40px;
+  width: 0;
+  height: 0;
+  border-top: 35px solid transparent;
+  border-right: 25px solid #ffc537;
+  border-bottom: 35px solid transparent;
+}

@@ -21,6 +21,7 @@
     <div *ngFor="let report of items" id="{{report.$key}}" class="tab-pane fade">
       <!--<p>place holder for {{report.templateName}}</p>-->
       <sh-report-general [general]="general"></sh-report-general>
+      <sh-report-corpus [corpus]="corpus"></sh-report-corpus>
     </div>
   </div>
 </div>
