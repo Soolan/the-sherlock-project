@@ -1,16 +1,35 @@
 .corpus {
-  margin-top: 20px;
+  margin-top: 30px;
+}
+.corpus h1 {
+  text-align: center;
+  font-style: oblique;
+  font-weight: bolder;
+  color: #fff;
 }
 
+.corpus p {
+  font-size: large;
+  color: #004455;
+  padding: 14px 0;
+}
+.corpus a {
+  float: right;
+  font-size: medium;
+  color: #225500;
+}
+
+.space {
+  margin-left: 40px;
+}
 #talkbubble1 {
-  margin-top: 20px;
-  width: 290px;
-  height: 150px;
-  background: #ffc537;
-  background: -webkit-linear-gradient(left, #ffc537, #cbcbcb); /* For Safari 5.1 to 6.0 */
-  background: -o-linear-gradient(right, #ffc537, #cbcbcb); /* For Opera 11.1 to 12.0 */
-  background: -moz-linear-gradient(right, #ffc537, #cbcbcb); /* For Firefox 3.6 to 15 */
-  background: linear-gradient(right, #ffc537, #cbcbcb); /* Standard syntax */
+  margin-bottom: 20px;
+  height: 130px;
+  background: #f4ffb4;
+  background: -webkit-linear-gradient(left, #F4FFB4, #ababab); /* For Safari 5.1 to 6.0 */
+  background: -o-linear-gradient(right, #F4FFB4, #ababab); /* For Opera 11.1 to 12.0 */
+  background: -moz-linear-gradient(right, #F4FFB4, #ababab); /* For Firefox 3.6 to 15 */
+  background: linear-gradient(right, #F4FFB4, #ababab); /* Standard syntax */
   position: relative;
   -moz-border-radius:    10px;
   -webkit-border-radius: 10px;
@@ -20,23 +39,22 @@
   content:"";
   position: absolute;
   right: 100%;
-  top: 40px;
+  top: 5px;
   width: 0;
   height: 0;
-  border-top: 35px solid transparent;
-  border-right: 25px solid #ffc537;
-  border-bottom: 35px solid transparent;
+  border-top: 60px solid transparent;
+  border-right: 25px solid #F4FFB4;
+  border-bottom: 60px solid transparent;
 }
 
 #talkbubble2 {
   margin-top: 20px;
-  width: 290px;
-  height: 150px;
-  background: #ffc537;
-  background: -webkit-linear-gradient(left, #ffc537, #cbcbcb); /* For Safari 5.1 to 6.0 */
-  background: -o-linear-gradient(right, #ffc537, #cbcbcb); /* For Opera 11.1 to 12.0 */
-  background: -moz-linear-gradient(right, #ffc537, #cbcbcb); /* For Firefox 3.6 to 15 */
-  background: linear-gradient(right, #ffc537, #cbcbcb); /* Standard syntax */
+  height: 130px;
+  background: #ffed79;
+  background: -webkit-linear-gradient(left, #ffed79, #ababab); /* For Safari 5.1 to 6.0 */
+  background: -o-linear-gradient(right, #ffed79, #ababab); /* For Opera 11.1 to 12.0 */
+  background: -moz-linear-gradient(right, #ffed79, #ababab); /* For Firefox 3.6 to 15 */
+  background: linear-gradient(right, #ffed79, #ababab); /* Standard syntax */
   position: relative;
   -moz-border-radius:    10px;
   -webkit-border-radius: 10px;
@@ -46,23 +64,22 @@
   content:"";
   position: absolute;
   right: 100%;
-  top: 40px;
+  top: 5px;
   width: 0;
   height: 0;
-  border-top: 35px solid transparent;
-  border-right: 25px solid #ffc537;
-  border-bottom: 35px solid transparent;
+  border-top: 60px solid transparent;
+  border-right: 25px solid #ffed79;
+  border-bottom: 60px solid transparent;
 }
 
 #talkbubble3 {
   margin-top: 20px;
-  width: 290px;
-  height: 150px;
-  background: #ffc537;
-  background: -webkit-linear-gradient(left, #ffc537, #cbcbcb); /* For Safari 5.1 to 6.0 */
-  background: -o-linear-gradient(right, #ffc537, #cbcbcb); /* For Opera 11.1 to 12.0 */
-  background: -moz-linear-gradient(right, #ffc537, #cbcbcb); /* For Firefox 3.6 to 15 */
-  background: linear-gradient(right, #ffc537, #cbcbcb); /* Standard syntax */
+  height: 130px;
+  background: #ffc08b;
+  background: -webkit-linear-gradient(left, #ffc08b, #ababab); /* For Safari 5.1 to 6.0 */
+  background: -o-linear-gradient(right, #ffc08b, #ababab); /* For Opera 11.1 to 12.0 */
+  background: -moz-linear-gradient(right, #ffc08b, #ababab); /* For Firefox 3.6 to 15 */
+  background: linear-gradient(right, #ffc08b, #ababab); /* Standard syntax */
   position: relative;
   -moz-border-radius:    10px;
   -webkit-border-radius: 10px;
@@ -72,10 +89,34 @@
   content:"";
   position: absolute;
   right: 100%;
-  top: 40px;
+  top: 5px;
   width: 0;
   height: 0;
-  border-top: 35px solid transparent;
-  border-right: 25px solid #ffc537;
-  border-bottom: 35px solid transparent;
+  border-top: 60px solid transparent;
+  border-right: 25px solid #ffc08b;
+  border-bottom: 60px solid transparent;
+}
+
+
+.circle {
+  padding: 8px;
+  position: relative;
+  background: #ababab;
+  z-index: 10;
+  -moz-border-radius: 50%;
+  -webkit-border-radius: 50%;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+}
+
+.circle-inner {
+  padding: 7px;
+  background: #cbcbcb;
+  -moz-border-radius: 50%;
+  -webkit-border-radius: 50%;
+  width: 113px;
+  height: 113px;
+  border-radius: 50%;
+  border: 10px solid #fff;
 }

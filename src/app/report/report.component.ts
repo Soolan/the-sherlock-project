@@ -14,11 +14,11 @@ export class ReportComponent implements OnInit {
   private reports = [];
   private general = {mainKeyword:'MARS', corpusSize:'540', vocabularySize:'15000'};
   private corpus = {
-    topFreqs: [{word:'w1', reps:10}, {word:'w2', reps:9}],
+    topFreqs: [{word:'w1', count:10}, {word:'w2', count:9}],
     topIDFs: [{word:'w1', idf:0.4}, {word:'w2', idf:0.3}],
-    biggestArticle: {size:3000, link:'http://www.test.com'},
-    smallestArticle: {size:50, link:'http://www.test.com'},
-    averageSize: 750
+    longestArticle: {size:4765, link:'http://www.test.com'},
+    shortestArticle: {size:58, link:'http://www.test.com'},
+    averageSize: 759
   };
   private reportService;
 
