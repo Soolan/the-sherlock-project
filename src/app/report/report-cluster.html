@@ -1,0 +1,19 @@
+<div class="row cluster">
+  <!--<div class="col-md-12" [visNetworkOptions]="visNetworkOptions"-->
+    <!--[visNetwork]="visNetwork" [visNetworkData]="visNetworkData">-->
+  <!--</div>-->
+  <div *ngFor="let c of cluster.clusters" class="">
+    <h1>{{c.name}}</h1>
+    <div *ngFor="let node of c.nodes" class="">
+      <h2>{{node.word_count}}, {{node.distance}}, {{node.link}}</h2>
+      <h3>These are some phrases in that article which contain the word {{clusters.root}} (main keyword)</h3>
+      <ul>
+        <li *ngFor="let main_phrase of node.main_phrases">{{main_phrase}}</li>
+      </ul>
+      <h3>These are some phrases in that article which contain the word {{c.name}} (cluster center keyword)</h3>
+      <ul>
+        <li *ngFor="let keyword_phrase of node.keyword_phrases">{{keyword_phrase}}</li>
+      </ul>
+    </div>
+  </div>
+</div>
