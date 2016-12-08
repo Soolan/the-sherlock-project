@@ -61,7 +61,7 @@ export class EvidenceComponent implements OnInit{
       setTimeout(function() {
         self.network.set(data[0]);
         self.modal.showModal(data[0]);
-      }, 25000);
+      }, 35000);
       // this.visNetworkService.setData("idOfYourNetwork", data);
     });
   }

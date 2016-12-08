@@ -7,7 +7,7 @@ import {ReportConfig} from "./report.config";
   templateUrl: './report.html'
 })
 export class ReportComponent implements OnInit {
-  // private templates;//: FirebaseListObservable<any>;
+  private network: FirebaseObjectObservable <any>;
   private templates: FirebaseListObservable<any>;
   private items = [];
   private angularFire;
@@ -21,6 +21,7 @@ export class ReportComponent implements OnInit {
     averageSize: 759
   };
   private cluster = {
+    // network: this.network,
     root: 'MARS',
     clusters: [{
       name: 'radiation',
@@ -52,8 +53,7 @@ export class ReportComponent implements OnInit {
     // this.reportService= rs;
     // this.angularFire = af;
     this.templates = af.database.list('/Report/templates');
-    // this.network = af.database.object('Evidence/Corpus/network-graph');
-    // .subscribe(data => this.templates);
+    this.network = af.database.object('Evidence2/Corpus/network-graph');
   }
 
   ngOnInit() {

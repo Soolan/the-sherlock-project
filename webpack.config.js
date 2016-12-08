@@ -23,8 +23,10 @@ var webpackConfig = {
     loaders: [
       // .ts files for TypeScript
       { test: /\.ts$/, loaders: ['awesome-typescript-loader', 'angular2-template-loader'] },
-      { test: /\.css$/, loaders: ['to-string-loader', 'css-loader'] },
+      { test: /\.css$/, loaders: ['to-string-loader', 'css-loader'] }, /*loader: 'raw-loader'},*/
       { test: /\.html$/, loader: 'raw-loader' }
+      // { test: /\.png$/, loader: "url-loader?limit=100000" },
+      // { test: /\.jpg$/, loader: "file-loader" }
     ]
   }
 

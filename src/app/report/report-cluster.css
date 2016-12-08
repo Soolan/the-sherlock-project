@@ -11,7 +11,7 @@
 }
 
 .spine{
-  background:url(http://dummyimage.com/1x1/f43059/f43059.gif) top center repeat-y;
+  background:url(http://dummyimage.com/1x1/6d19f4/6d19f4.gif) top center repeat-y;
   width:1024px;
   padding:20px 0;
   margin:0 auto 20px auto;
@@ -100,6 +100,7 @@
   font-weight: bolder;
   color: white;
   text-align: center;
+  margin-top: 0;
   background: repeating-linear-gradient(
     45deg,
     #4040bb,
@@ -112,7 +113,6 @@
 
 ul.tree, ul.tree ul {
   list-style-type: none;
-  background: url(vline.png) repeat-y;
   margin: 0;
   padding: 0;
 }
@@ -123,13 +123,37 @@ ul.tree ul {
 
 ul.tree li {
   margin: 0;
-  padding: 0 12px;
-  line-height: 20px;
-  background: url(node.png) no-repeat;
+  padding: 5px;
+  line-height: 17px;
   color: #369;
-  font-weight: bold;
+}
+.tree h2 {
+  color: #248;
 }
 
-ul.tree li:last-child {
-  background: #fff url(lastnode.png) no-repeat;
+.tree h4 {
+  color: #50f;
+  margin-top: 20px;
 }
+
+.node {
+  background: #ecf;
+  margin: 5px 10px;
+  border-top: 1px dotted #aab;
+  border-bottom: 1px dotted #aab;
+}
+
+.node-details {
+  background: #edf;
+  margin: 5px 20px;
+}
+
+.phrases{
+  background: #eeefff;
+}
+
+.phrases h5{
+  background: #ddf;
+  padding: 5px;
+}
+
