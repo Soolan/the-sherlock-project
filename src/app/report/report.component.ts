@@ -71,6 +71,7 @@ export class ReportComponent implements OnInit {
       corpus:  this.setCorpus(template),
       cluster: this.setCluster(template)
     });
+    console.log('in set report:', this.reports);
   }
 
   setGeneral(template) {
@@ -81,6 +82,7 @@ export class ReportComponent implements OnInit {
         general['mainKeyword'] = snapshot.val().mainKeyword;
         general['corpusSize'] =  template.corpusSize?snapshot.val().corpusSize:null;
         general['vocabularySize'] = template.vocabularySize?snapshot.val().vocabularySize:null;
+        console.log('in set general:', general);
       }
     });
     return general;
