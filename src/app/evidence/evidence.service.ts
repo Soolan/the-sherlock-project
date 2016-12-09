@@ -237,52 +237,7 @@ export class EvidenceService implements OnInit {
         });
       });
   }
-  // Print solution (open this)
-  /*
-<!DOCTYPE html>
- <html>
 
- <head>
- <meta charset="utf-8" />
- <title>AngularJS Print Directive of html templates </title>
- <link rel="stylesheet" href="style.css" />
- <script src="https://code.angularjs.org/1.4.1/angular.js"></script>
- <script>
- var app = angular.module('myApp', []);
-
- app.controller('myCtrl', function($scope) {
- $scope.printToCart = function(printSectionId) {
- var innerContents = document.getElementById(printSectionId).innerHTML;
- var popupWinindow = window.open('', '_blank', 'width=600,height=700,scrollbars=no,menubar=no,toolbar=no,location=no,status=no,titlebar=no');
- popupWinindow.document.open();
- popupWinindow.document.write('<html><head><link rel="stylesheet" type="text/css" href="style.css" /></head><body onload="window.print()">' + innerContents + '</html>');
- popupWinindow.document.close();
- }
- });
- </script>
- </head>
-
- <body id="printSectionId" ng-app="myApp">
- <div ng-controller="myCtrl">
- <h1>AngularJS Print html templates</h1>
- <form novalidate>
- First Name:
- <input type="text" ng-model="firstName" class="tb8">
- <br>
- <br> Last Name:
- <input type="text" ng-model="lastName" class="tb8">
- <br>
- <br>
- <button ng-click="Submit()" class="button">Submit</button>
- <button ng-click="printToCart('printSectionId')" class="button">Print</button>
- </form>
- </div>
- <div>
- <br/>
- <br/><a href="http://www.code-sample.com/2015/07/angularjs-2-forms-validation.html" target="_blank">More About AngularJS Print...</a></div>
- </body>
-
- </html>*/
   getIDF(word, IDFs) {
     var idf = 0;
     IDFs.some((item: any) => {

@@ -5,7 +5,9 @@
         <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
       </a>
     </li>
-    <li *ngFor="let report of items"><a data-toggle="tab" href="#{{report.$key}}">{{report.templateName}}</a></li>
+    <li *ngFor="let report of items">
+      <a data-toggle="tab" href="#{{report.$key}}">{{report.templateName}}</a>
+    </li>
   </ul>
   <div class="tab-content">
     <div id="config" class="tab-pane fade in active">
@@ -18,10 +20,9 @@
         <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
       </button>
     </div>
-    <div *ngFor="let report of items" id="{{report.$key}}" class="tab-pane fade">
-      <!--<p>place holder for {{report.templateName}}</p>-->
-      <sh-report-general [general]="general"></sh-report-general>
-      <sh-report-corpus [corpus]="corpus"></sh-report-corpus>
+    <div *ngFor="let report of items; let i=index" id="{{report.$key}}" class="tab-pane fade">
+      <sh-report-general [general]="reports[i].general"></sh-report-general>
+      <sh-report-corpus [corpus]="reports[i].corpus"></sh-report-corpus>
       <sh-report-cluster [cluster]="cluster"></sh-report-cluster>
     </div>
   </div>

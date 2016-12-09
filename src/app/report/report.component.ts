@@ -1,18 +1,19 @@
 import {Component, OnInit} from '@angular/core';
 import {FirebaseListObservable, AngularFire, FirebaseObjectObservable} from "angularfire2";
 import {ReportConfig} from "./report.config";
+import {ReportService} from "./report.service";
 
 @Component({
   selector: 'sh-report',
   templateUrl: './report.html'
 })
 export class ReportComponent implements OnInit {
-  private network: FirebaseObjectObservable <any>;
+  private reportService: ReportService;
   private templates: FirebaseListObservable<any>;
+  private stats: FirebaseObjectObservable <any>;
   private items = [];
   private angularFire;
   private reports = [];
-  private general = {mainKeyword: 'MARS', corpusSize: '540', vocabularySize: '15000'};
   private corpus = {
     topFreqs: [{word: 'w1', count: 10}, {word: 'w2', count: 9}],
     topIDFs: [{word: 'w1', idf: 0.4}, {word: 'w2', idf: 0.3}],
@@ -47,23 +48,51 @@ export class ReportComponent implements OnInit {
       }]
     }]};
 
-  private reportService;
-
-  constructor(/*rs:ReportService, */af: AngularFire) {
-    // this.reportService= rs;
-    // this.angularFire = af;
+  constructor(rs:ReportService, af: AngularFire) {
+    this.reportService = rs;
     this.templates = af.database.list('/Report/templates');
-    this.network = af.database.object('Evidence2/Corpus/network-graph');
+    this.stats = af.database.object('Evidence/Corpus/Stats', {preserveSnapshot: true});
   }
 
   ngOnInit() {
-    // this.templates  = new ReportConfig('test', true, true, false, 5, 6, true, true, false, true, true,
-    //     {show: true, size: true, distance: true, url: true}, 11, 22);
     this.templates.subscribe(data => {
       this.items = data;
-      console.log('templates:', this.templates);
-      console.log('items:', this.items);
+      // empty the reports array otherwise any changes in the template page
+      // adds new entries to the array and you will end up with duplicates.
+      this.reports = [];
+      this.items.forEach(item => this.setReport(item));
     });
+  }
+
+  setReport(template) {
+    // this.setGeneral(template);
+    this.reports.push({
+      general: this.setGeneral(template),
+      corpus:  this.setCorpus(template),
+      cluster: this.setCluster(template)
+    });
+  }
+
+  setGeneral(template) {
+    let general = {};
+    this.stats.subscribe(snapshot => {
+      if (snapshot.exists()) {
+        //object exists
+        general['mainKeyword'] = snapshot.val().mainKeyword;
+        general['corpusSize'] =  template.corpusSize?snapshot.val().corpusSize:null;
+        general['vocabularySize'] = template.vocabularySize?snapshot.val().vocabularySize:null;
+      }
+    });
+    return general;
+  }
+
+  setCorpus(template) {
+    // ToDo: Initialize related values via service
+    return this.reportService.setCorpus(template);
+  }
+
+  setCluster(template) {
+    // ToDo: Initialize related values via service
   }
 
   newReportTemplate() {
