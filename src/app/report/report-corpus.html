@@ -10,6 +10,17 @@
           <th>Counts</th>
         </tr>
         </thead>
+        <tbody *ngIf="corpus.topFreqs.length==0">
+          <tr>
+            <td colspan="3">
+              <div class="spinner">
+                <div class="bounce1"></div>
+                <div class="bounce2"></div>
+                <div class="bounce3"></div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
         <tbody *ngFor="let w of corpus.topFreqs; let i=index">
         <tr>
           <th>{{i+1}}</th>
@@ -18,6 +29,7 @@
         </tr>
         </tbody>
       </table>
+
     </div>
   </div>
   <div class="col-md-3">
@@ -31,6 +43,17 @@
           <th>IDFs</th>
         </tr>
         </thead>
+        <tbody *ngIf="corpus.topIDFs.length==0">
+        <tr>
+          <td colspan="3">
+            <div class="spinner">
+              <div class="bounce1"></div>
+              <div class="bounce2"></div>
+              <div class="bounce3"></div>
+            </div>
+          </td>
+        </tr>
+        </tbody>
         <tbody *ngFor="let w of corpus.topIDFs; let i=index">
         <tr>
           <th>{{i+1}}</th>
@@ -50,7 +73,9 @@
         </p>
       </div>
       <div class="col-md-4 circle">
-        <div class="circle-inner"><h1>{{corpus.longestArticle.size}}</h1></div>
+        <div class="circle-inner">
+          <h1>{{corpus.longestArticle.size}}</h1>
+        </div>
       </div>
     </div>
     <div class="row" id="talkbubble2">
