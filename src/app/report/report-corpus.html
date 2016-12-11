@@ -29,7 +29,6 @@
         </tr>
         </tbody>
       </table>
-
     </div>
   </div>
   <div class="col-md-3">
@@ -66,35 +65,48 @@
   </div>
   <div class="col-md-1"></div>
   <div class="col-md-4">
-    <div class="row" id="talkbubble1">
-      <div class="col-md-8">
-        <p>The longest article in this corpus with {{corpus.longestArticle.size}} words is located here: <br>
-          <a href="{{corpus.longestArticle.link}}">{{corpus.longestArticle.link}}</a>
-        </p>
+    <div *ngIf="corpus.articleStats.length==0">
+      <p>Depend on the corpus size, calculating article stats might takes a few minutes. Please be patient...</p>
+      <div class="spinner2" >
+        <div class="double-bounce1"></div>
+        <div class="double-bounce2"></div>
       </div>
-      <div class="col-md-4 circle">
-        <div class="circle-inner">
-          <h1>{{corpus.longestArticle.size}}</h1>
+    </div>
+    <div *ngIf="corpus.articleStats.length>0">
+      <div *ngFor="let s of corpus.articleStats">
+        <div class="row" id="talkbubble1">
+          <div class="col-md-8">
+            <p>The longest article in this corpus with {{s.longestArticle.size}} letters is located here: <br>
+              <a href="{{s.longestArticle.link}}">{{s.longestArticle.link|slice:0:42}}...</a>
+            </p>
+          </div>
+          <div class="col-md-4 circle">
+            <div class="circle-inner">
+              <h1>{{s.longestArticle.size}}</h1>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-    <div class="row" id="talkbubble2">
-      <div class="col-md-8">
-        <br>
-        <p>The average article size in the corpus contains {{corpus.averageSize}} words</p>
-      </div>
-      <div class="col-md-4 circle">
-        <div class="circle-inner"><h1>{{corpus.averageSize}} </h1></div>
-      </div>
-    </div>
-    <div class="row" id="talkbubble3">
-      <div class="col-md-8">
-        <p>The Shortest article in this corpus with {{corpus.shortestArticle.size}} words can be found here: <br>
-          <a href="{{corpus.shortestArticle.link}}">{{corpus.shortestArticle.link}}</a>
-        </p>
-      </div>
-      <div class="col-md-4 circle">
-        <div class="circle-inner"><h1>{{corpus.shortestArticle.size}}</h1></div>
+        <div class="row" id="talkbubble2">
+          <div class="col-md-8">
+            <br>
+            <p>The average article size in the corpus contains {{s.averageSize}} letters</p>
+          </div>
+          <div class="col-md-4 circle">
+            <div class="circle-inner">
+              <h1>{{s.averageSize}} </h1>
+            </div>
+          </div>
+        </div>
+        <div class="row" id="talkbubble3">
+          <div class="col-md-8">
+            <p>The Shortest article in this corpus with {{s.shortestArticle.size}} letters can be found here: <br>
+              <a href="{{s.shortestArticle.link}}">{{s.shortestArticle.link|slice:0:42}}...</a>
+            </p>
+          </div>
+          <div class="col-md-4 circle">
+            <div class="circle-inner"><h1>{{s.shortestArticle.size}}</h1></div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
