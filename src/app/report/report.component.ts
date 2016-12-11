@@ -65,13 +65,11 @@ export class ReportComponent implements OnInit {
   }
 
   setReport(template) {
-    // this.setGeneral(template);
     this.reports.push({
       general: this.setGeneral(template),
       corpus:  this.setCorpus(template),
       cluster: this.setCluster(template)
     });
-    console.log('in set report:', this.reports);
   }
 
   setGeneral(template) {
