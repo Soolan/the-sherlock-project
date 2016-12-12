@@ -61,20 +61,20 @@ export class ReportService{
         let shortest = (template.shortestArticle)?
           (data.reduce(function (a, b) {
           return a.article.length > b.article.length ? b : a;
-          })):null;
-        let longest = (template.shortestArticle)?
+          })):{article:{length:0}, link:'check the box in the config tab'};
+        let longest = (template.longestArticle)?
           (data.reduce(function (a, b) {
           return a.article.length > b.article.length ? a : b;
-        })):null;
+        })):{article:{length:0}, link:'check the box in the config tab'};
         stats.push({
-          longestArticle: longest ? {
+          longestArticle: {
             size: longest.article.length, link: longest.link
-          }:null,
+          },
           averageSize: template.avgArticleSize?
             Math.round(sum/data.length): 0,
-          shortestArticle: shortest ? {
+          shortestArticle: {
             size: shortest.article.length, link: shortest.link
-          }:null
+          }
         });
       });
     return {

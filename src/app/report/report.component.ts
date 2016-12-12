@@ -14,13 +14,6 @@ export class ReportComponent implements OnInit {
   private items = [];
   private angularFire;
   private reports = [];
-  private corpus = {
-    topFreqs: [{word: 'w1', count: 10}, {word: 'w2', count: 9}],
-    topIDFs: [{word: 'w1', idf: 0.4}, {word: 'w2', idf: 0.3}],
-    longestArticle: {size: 4765, link: 'http://www.test.com'},
-    shortestArticle: {size: 58, link: 'http://www.test.com'},
-    averageSize: 759
-  };
   private cluster = {
     // network: this.network,
     root: 'MARS',
@@ -87,12 +80,12 @@ export class ReportComponent implements OnInit {
   }
 
   setCorpus(template) {
-    // ToDo: Initialize related values via service
     return this.reportService.setCorpus(template);
   }
 
   setCluster(template) {
     // ToDo: Initialize related values via service
+    // return this.reportService.setCluster(template);
   }
 
   newReportTemplate() {
@@ -113,9 +106,4 @@ export class ReportComponent implements OnInit {
   onDeleteReportTemplate(report) {
     this.templates.remove(report.$key);
   }
-
-  // 1. read templates from db
-  // 2. save them in an array
-  // 3. loop through the array and render them
-  // use @Input and @Output
 }
