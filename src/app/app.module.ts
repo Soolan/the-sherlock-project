@@ -18,9 +18,14 @@ import {RatingService} from "./rating/rating.service";
 import {RatingLogic} from "./rating/rating.logic";
 import {EvidenceComponent} from "./evidence/evidence.component";
 import {EvidenceService} from "./evidence/evidence.service";
-import {AiComponent} from './ai/ai.component';
 import {VisModule} from 'ng2-vis';
 import {ModalComponent} from './modal/modal.component';
+import {ReportComponent} from "./report/report.component";
+import {ReportTemplateComponent} from "./report/report-template.component";
+import {ReportGeneralComponent} from "./report/report-general.component";
+import {ReportCorpusComponent} from "./report/report-corpus.component";
+import {ReportClusterComponent} from "./report/report-cluster.component";
+import {ReportService} from "./report/report.service";
 
 export const firebaseConfig = {
   apiKey: "AIzaSyA8C9a7wZ9r-5BsMXJbP3-6_raliTVkHpk",
@@ -51,7 +56,9 @@ export const timeSpans = [
   declarations: [
     AppComponent, NavigationComponent, CollectorComponent,
     RatingComponent, NotifierComponent, EvidenceComponent,
-    AiComponent, OrderByPipe, ModalComponent
+    OrderByPipe, ModalComponent, ReportComponent,
+    ReportTemplateComponent, ReportGeneralComponent,
+    ReportCorpusComponent, ReportClusterComponent
   ],
   schemas     : [CUSTOM_ELEMENTS_SCHEMA],
   imports     : [
@@ -63,7 +70,7 @@ export const timeSpans = [
   providers   : [
     {provide: LocationStrategy, useClass: HashLocationStrategy},
     CollectorService, RatingService, RatingLogic, NotifierService,
-    EvidenceService
+    EvidenceService, ReportService
   ],
   bootstrap   : [AppComponent]
 })

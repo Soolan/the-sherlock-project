@@ -2,7 +2,7 @@ import {Injectable, OnInit} from "@angular/core";
 import forEach = require("core-js/fn/array/for-each");
 import {Response, Http} from "@angular/http";
 import {Observable} from "rxjs";
-import {AngularFire, FirebaseListObservable} from "angularfire2";
+import {AngularFire, FirebaseListObservable, FirebaseObjectObservable} from "angularfire2";
 import {googleSearchConfig, timeSpans} from "../app.module";
 
 @Injectable()
@@ -15,7 +15,9 @@ export class EvidenceService implements OnInit {
   private angularFire;
   private corpus: FirebaseListObservable <any>;
   private IDFs: FirebaseListObservable <any>;
-  private clusters;//: FirebaseListObservable <any>;
+  private summary: FirebaseObjectObservable <any>;
+  private sumTest = [];
+  private clusters;
   private colors = [{
     border: '#555555',
     background: '#BBBBBB',
@@ -80,13 +82,15 @@ export class EvidenceService implements OnInit {
   evaluateWords(instances) {
     var self = this;
     var normFactor = this.calculateNorm(instances);
-    return Promise.all(instances.map(function (w) {
-      if (w.word.length < 20) {
+    return Promise.all(instances
+      .filter(function(w) { //better way to weed out nonsense long words
+        return w.word.length < 20;
+      })
+      .map(function (w) {
         var normalized = w.count / normFactor;
         w['normalized'] = normalized.toFixed(4);
         self.words.push(w);
-      }
-      return w;
+        return w;
     }));
   }
 
@@ -168,12 +172,6 @@ export class EvidenceService implements OnInit {
       "&format=json&diagnostics=true&callback=";
   }
 
-  // 1. loop through articles
-  // 2. gather all unique words by looking into bag_of_words for each article
-  // 3. loop through unique words
-  // 4. find number of articles that each unique word exists in
-  // 5. calculate idf
-  // 6. save IDFs as array of {word:'', number_of_docs:'', idf:''}
   saveIDFs() {
     var uniqueBagOfWords = {};
     this.IDFs.remove();
@@ -182,12 +180,19 @@ export class EvidenceService implements OnInit {
         this.corpusSize = snapshot.numChildren();
         snapshot.forEach(item => {
           item.child('bag_of_words').val().forEach(w => {
-            uniqueBagOfWords.hasOwnProperty(w.word) ?
-              uniqueBagOfWords[w.word]++ :
-              uniqueBagOfWords[w.word] = 1;
+            if (w.word.length < 20) {
+              uniqueBagOfWords.hasOwnProperty(w.word) ?
+                uniqueBagOfWords[w.word]++ :
+                uniqueBagOfWords[w.word] = 1;
+            }
           });
         });
-        var words = Object.keys(uniqueBagOfWords);
+
+        var words = Object.keys(uniqueBagOfWords)
+          // lets sort them based on their occurance
+          .sort(function (a, b) {
+            return uniqueBagOfWords[b] - uniqueBagOfWords[a]
+          });
         this.vocabularySize = words.length;
         words.forEach(word => {
           var idf = Math.abs(Math.log2(
@@ -205,6 +210,29 @@ export class EvidenceService implements OnInit {
               item['tfidf_N'] = (idf * item.normalized).toFixed(4);
               return true;
             }
+          })
+        });
+      });
+  }
+
+  summaryTest() {
+    // corpus size
+    // vocabulary
+    // top 10 frequent words in the corpus
+    // top 10 words with highest IDF
+    // longest article link + word count + unique words
+    // shortest article link + word count + unique words
+    // main keyword
+    // cluster centers
+    // articles for each center: no. of words + link + distance + summary (lets say 10 bullets)
+    this.IDFs._ref.orderByChild("IDF")
+      .startAt(4)/*.endAt(20)*/.limitToLast(300).once("value")
+      .then(snapshot => {
+        snapshot.forEach(item => {
+          this.sumTest.push({
+            docs:item.child('doc_with_word').val(),
+            word:item.child('word').val(),
+            idf:item.child('IDF').val()
           })
         });
       });
@@ -291,40 +319,39 @@ export class EvidenceService implements OnInit {
     });
 
     return Promise.all(keywords.map(function (word) {
-        observations[word] = [];
-        records
-          .then(snapshot => {
-            max = 0;
-            snapshot.forEach(article => {
-              count = 0;
-              flag = false;
-              article.child('bag_of_words').val().forEach(w => {
-                if (w.word == word) count += w.count;
-                if (w.word == main) flag = true;
-              });
-              if (flag && count > max) {
-                max = count;
-                clusterCenters[word] = {
-                  id: article.key,
-                  bag_of_words: article.child('bag_of_words').val()
-                }
-              }
-            })
-            currentCenterId = id++; //clusterCenters[word].id;
-            nodes.push({
-              id: currentCenterId,
-              label: word,
-              title:[word, 'This is a cluster center', 0],
-              color: self.colors[1],
-              borderWidth: 2,
-              borderWidthSelected: 3,
-              font: {size: 28},
+      observations[word] = [];
+      records
+        .then(snapshot => {
+          max = 0;
+          snapshot.forEach(article => {
+            count = 0;
+            flag = false;
+            article.child('bag_of_words').val().forEach(w => {
+              if (w.word == word) count += w.count;
+              if (w.word == main) flag = true;
             });
-            edges.push({from: 1, to: currentCenterId, width: 2});
-            console.log('first then:',clusterCenters);
-            return clusterCenters;
+            if (flag && count > max) {
+              max = count;
+              clusterCenters[word] = {
+                id: article.key,
+                bag_of_words: article.child('bag_of_words').val()
+              }
+            }
           })
-          .then(centers => {
+          currentCenterId = id++; //clusterCenters[word].id;
+          nodes.push({
+            id: currentCenterId,
+            label: word,
+            title:[word, 'This is a cluster center', 0],
+            color: self.colors[1],
+            borderWidth: 2,
+            borderWidthSelected: 3,
+            font: {size: 28},
+          });
+          edges.push({from: 1, to: currentCenterId, width: 2});
+          return clusterCenters;
+        })
+        .then(centers => {
             var i = 1;
             return records
               .then(snapshot => {
@@ -363,13 +390,15 @@ export class EvidenceService implements OnInit {
                   // );
 
                   nodes.push({
-                    id: id /*item.id*/,
+                    id: id /*item.id won't work here. Because it should be unique and
+                    chances are it won't be. (An article - depend on the distance - can
+                    apper in two or more clusters.)*/,
                     label: (item.link)?item.link
                       .replace('http://','')
                       .replace('https://','')
                       .replace('www.','').split("/")[0]+'\n'+item.size+' words'
                     :'4xx', // for 404 or 400 responses
-                    title: [item.link, item.size],
+                    title: [item.link, item.id],
                     shadow:{ enabled: true, color: 'rgba(0,0,0,0.5)', size:11, x:3, y:3 },
                     color: self.colors[colorIndex],
                     shape: 'box'
@@ -396,26 +425,10 @@ export class EvidenceService implements OnInit {
           })// calculate distance to the centers for all articles in the corpus
 
       network = {nodes: nodes, edges: edges};
-      // self.clusters = {nodes: nodes, edges: edges};
+
       console.log('[in service] network:', network);
       return network;
-      })
-    );
+    }));
   }
-
-  // getPoints(contents,word) {
-  //   var start, end;
-  //   var l = contents.length;
-  //   var points = [];
-  //   for(var pos = contents.indexOf(word);
-  //       pos !== -1;
-  //       pos = contents.indexOf(word, pos+1)) {
-  //     (pos < 30)? start = 0 : start = pos - 30;
-  //     (pos > l - 40)? end = l : end = pos + 40;
-  //     console.log('getPoints: ', points, pos, start, end, l);
-  //     points.push('...'+contents.substring(start,end)+'...');
-  //   }
-  //   return points;
-  // }
 }
 
