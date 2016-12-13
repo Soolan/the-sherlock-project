@@ -12,34 +12,7 @@ export class ReportComponent implements OnInit {
   private templates: FirebaseListObservable<any>;
   private stats: FirebaseObjectObservable <any>;
   private items = [];
-  private angularFire;
   private reports = [];
-  private cluster = {
-    // network: this.network,
-    root: 'MARS',
-    clusters: [{
-      name: 'radiation',
-      nodes: [{
-        word_count: 234, distance: 0.2, link: 'http:www.test.com',
-        main_phrases: ['mph1','mph2','mph3','mph4'],
-        keyword_phrases: ['kph1','kph2','kph3','kph4']
-      },{
-        word_count: 434, distance: 0.1, link: 'http:www.test.com',
-        main_phrases: ['mph1','mph2','mph3','mph4'],
-        keyword_phrases: ['kph1','kph2','kph3','kph4']
-      }]
-    },{
-      name: 'water',
-      nodes: [{
-        word_count: 657, distance: 0.3, link: 'http:www.test.com',
-        main_phrases: ['mph1','mph2','mph3','mph4'],
-        keyword_phrases: ['kph1','kph2','kph3','kph4']
-      },{
-        word_count: 879, distance: 0.2, link: 'http:www.test.com',
-        main_phrases: ['mph1','mph2','mph3','mph4'],
-        keyword_phrases: ['kph1','kph2','kph3','kph4']
-      }]
-    }]};
 
   constructor(rs:ReportService, af: AngularFire) {
     this.reportService = rs;
@@ -73,7 +46,6 @@ export class ReportComponent implements OnInit {
         general['mainKeyword'] = snapshot.val().mainKeyword;
         general['corpusSize'] =  template.corpusSize?snapshot.val().corpusSize:null;
         general['vocabularySize'] = template.vocabularySize?snapshot.val().vocabularySize:null;
-        console.log('in set general:', general);
       }
     });
     return general;
@@ -84,15 +56,24 @@ export class ReportComponent implements OnInit {
   }
 
   setCluster(template) {
-    // ToDo: Initialize related values via service
-    // return this.reportService.setCluster(template);
+    return this.reportService.setCluster(template);
   }
 
   newReportTemplate() {
     this.templates.push(new ReportConfig('untitled333', false,
       false, false, 0, 0, false, false, false, false, false,
-      {show: true, size: false, distance: false, url: false}, 0, 0)
+      {show: false, size: false, distance: false, url: false}, 0, 0)
     );
+  }
+
+  printReport (id) {
+    let print = window.open('', '', '');
+    print.document.write('<html><title>Print</title><body>');
+    print.document.write(document.getElementById(id).innerHTML);
+    print.document.write('</body></html>');
+    print.document.close();
+    print.print();
+    return true;
   }
 
   onSaveReportTemplate(report) {

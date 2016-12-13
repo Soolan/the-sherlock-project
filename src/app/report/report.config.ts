@@ -11,9 +11,7 @@ export class ReportConfig {
     public avgArticleSize: boolean,
     public rootNode: boolean,
     public clusterNode: boolean,
-    public articleNode: {
-      show: boolean, size: boolean, distance: boolean, url:boolean
-    },
+    public articleNode: {show: boolean, size: boolean, distance: boolean, url:boolean},
     public maxRootPhrases: number,
     public maxCenterPhrases: number
   ) {}

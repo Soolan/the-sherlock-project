@@ -83,6 +83,76 @@ export class ReportService{
   }
 
   setCluster(template) {
-    // ToDo: Initialize related values
+    let root ='';
+    let centers = [];
+    let nodes = [];
+    let reportNodes = [];
+    let reportClusters = [];
+    if (template.rootNode) {
+      this.angularFire.database
+        .list('Evidence/Corpus/network-graph/nodes')
+        .subscribe(data => {
+          root = data[0].label;
+          data.shift(data[0]);
+          if (template.clusterNode) {
+            data.forEach(d => {
+              if (d.title[1].indexOf("cluster center") != -1) {
+                centers.push(d);
+              } else {
+                nodes.push(d);
+              }
+            });
+          }
+        });
+      this.angularFire.database
+        .list('Evidence/Corpus/network-graph/edges')
+        .subscribe(data => {
+          centers.forEach(c => {
+            reportNodes = [];
+            data.forEach (d => {
+              if (c.id == d.from) {
+                let node = nodes.filter(function(obj){return obj.id == d.to;})[0];
+                let link = node.title[0];
+                let wordCount = node.label.split("\n")[1];
+                let distance = d.label;
+                let mainPhrases = this.getPhrases(node.title[1], root, null);
+                let keyPhrases = this.getPhrases(node.title[1], c.label, null);
+                reportNodes.push({
+                  word_count: wordCount, distance: distance, link: link,
+                  main_phrases: mainPhrases, keyword_phrases: keyPhrases
+                })
+              }
+            });
+            reportClusters.push({
+              name: c.label, nodes: reportNodes
+            })
+          })
+        });
+    }
+    else {
+      root = 'root node is not selected';
+      reportClusters = null;
+    }
+    return { root: root, clusters: reportClusters };
+  }
+
+  getPhrases(id, word, limit) {
+    let phrases = [];
+    let range = 33; //number of chars on each side of keyword
+    this.angularFire.database
+      .object('Evidence/Corpus/Articles/'+id+'/article/')
+      ._ref.once("value").then(snapshot => {
+        let text = snapshot.val();
+        let i = text.indexOf(word);
+        while(i > -1 && limit-- > 0) {
+          (i-range <0)?
+            phrases.push(text.slice(0,i+range)):
+            (i+range > text.length )?
+              phrases.push('...'+text.slice(i-range,text.length)):
+              phrases.push('...'+text.slice(i-range,i+range)+'...');
+          i = text.indexOf(word, i+word.length);
+        }
+      });
+    return phrases;
   }
 }

@@ -73,16 +73,18 @@
               <div class="well well-sm">
                 <dl class="dl-horizontal">
                   <dt>Show graph for:</dt>
-                  <dd><input type="checkbox" name="root-node" [(ngModel)]="model.rootNode"/>Root node (Main Keyword)
+                  <dd><input type="checkbox" name="root-node"
+                             [(ngModel)]="model.rootNode"/>Root node (Main Keyword)
                   </dd>
-                  <dd><input type="checkbox" name="cluster-node" [(ngModel)]="model.clusterNode"/>Cluster centers
-                    (Insight keywords)
+                  <dd *ngIf="model.rootNode"><input type="checkbox" name="cluster-node"
+                             [(ngModel)]="model.clusterNode"/>Cluster centers (Insight keywords)
                   </dd>
-                  <dd><input type="checkbox" name="article-node-show" [(ngModel)]="model.articleNode.show"/>Article
+                  <dd  *ngIf="model.clusterNode && model.rootNode"><input type="checkbox" name="article-node-show"
+                             [(ngModel)]="model.articleNode.show"/>Article
                     nodes
                   </dd>
                 </dl>
-                <div *ngIf="model.articleNode.show">
+                <div *ngIf="model.clusterNode && model.rootNode && model.articleNode.show">
                   <dl class="dl-horizontal">
                     <dt>Show article details:</dt>
                     <dd>
@@ -99,21 +101,21 @@
                       </label>
                     </dd>
                   </dl>
+                  <hr>
+                  <label>
+                    List of
+                    <input type="text" size="1" class="input-sm" name="max-root-phrase"
+                           [(ngModel)]="model.maxRootPhrases"/>
+                    phrases in the article which contain the root node (Main Keyword)
+                  </label>
+                  <br>
+                  <label>
+                    List of
+                    <input type="text" size="1" class="input-sm" name="max-center-phrase"
+                           [(ngModel)]="model.maxCenterPhrases"/>
+                    phrases in the article which contain the cluster center
+                  </label>
                 </div>
-                <hr>
-                <label>
-                  List of
-                  <input type="text" size="1" class="input-sm" name="max-root-phrase"
-                         [(ngModel)]="model.maxRootPhrases"/>
-                  phrases in the article which contain the root node (Main Keyword)
-                </label>
-                <br>
-                <label>
-                  List of
-                  <input type="text" size="1" class="input-sm" name="max-center-phrase"
-                         [(ngModel)]="model.maxCenterPhrases"/>
-                  phrases in the article which contain the cluster center
-                </label>
               </div>
             </div>
           </div>

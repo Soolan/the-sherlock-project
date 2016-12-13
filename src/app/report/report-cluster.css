@@ -138,7 +138,7 @@ ul.tree li {
 
 .node {
   background: #ecf;
-  margin: 5px 10px;
+  margin: 5px;
   border-top: 1px dotted #aab;
   border-bottom: 1px dotted #aab;
 }

@@ -18,7 +18,6 @@ import {RatingService} from "./rating/rating.service";
 import {RatingLogic} from "./rating/rating.logic";
 import {EvidenceComponent} from "./evidence/evidence.component";
 import {EvidenceService} from "./evidence/evidence.service";
-import {AiComponent} from './ai/ai.component';
 import {VisModule} from 'ng2-vis';
 import {ModalComponent} from './modal/modal.component';
 import {ReportComponent} from "./report/report.component";
@@ -57,7 +56,7 @@ export const timeSpans = [
   declarations: [
     AppComponent, NavigationComponent, CollectorComponent,
     RatingComponent, NotifierComponent, EvidenceComponent,
-    AiComponent, OrderByPipe, ModalComponent, ReportComponent,
+    OrderByPipe, ModalComponent, ReportComponent,
     ReportTemplateComponent, ReportGeneralComponent,
     ReportCorpusComponent, ReportClusterComponent
   ],

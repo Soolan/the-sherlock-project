@@ -3,20 +3,21 @@
     <!--[visNetwork]="visNetwork" [visNetworkData]="visNetworkData">-->
   <!--</div>-->
   <h1>{{cluster.root}}</h1>
-  <ol class="spine">
+  <ol class="spine" *ngIf="cluster.clusters">
     <li *ngFor="let c of cluster.clusters">
       <h1>{{c.name}}</h1>
       <div *ngFor="let node of c.nodes; let i=index" class="node">
         <h5>
           <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
           <strong>node {{i+1 }}: </strong>
-          Words: {{node.word_count}}, Distance:{{node.distance}}, URL:{{node.link}}
+          Words: {{node.word_count}}, Distance:{{node.distance}},
+          URL:{{node.link| slice:0:55 }} {{node.link.length < 55 ? '' : '...'}}
         </h5>
       </div>
     </li>
   </ol>
   <hr>
-  <ul class="tree" *ngFor="let c of cluster.clusters">
+  <ul class="tree" *ngFor="let c of cluster.clusters;">
     <li>
       <h2>{{c.name}}</h2>
       <ul *ngFor="let node of c.nodes; let i=index">
@@ -24,10 +25,11 @@
           <h4>
             <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
             <strong>node {{i+1 }}: </strong>
-            Article length:{{node.word_count}} | Distance:{{node.distance}} | URL:{{node.link}}
+            Article length:{{node.word_count}} | Distance:{{node.distance}} |
+            URL:{{node.link | slice:0:55 }} {{node.link.length < 55 ? '' : '...'}}
           </h4>
           <div class="col-md-6 phrases">
-            <h5>These are some phrases in that article which contain the word {{cluster.root}}</h5>
+            <h5>These are some phrases in that article which contain the word Mars {{cluster.root}}</h5>
             <ul><li *ngFor="let main_phrase of node.main_phrases">{{main_phrase}}</li></ul>
           </div>
           <div class="col-md-6 phrases">
