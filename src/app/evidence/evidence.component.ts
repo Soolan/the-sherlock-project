@@ -1,8 +1,7 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {EvidenceService} from "./evidence.service";
-import {AngularFire} from "angularfire2";
+import {AngularFire, FirebaseObjectObservable} from "angularfire2";
 import {ModalComponent} from "../modal/modal.component";
-import {Observable} from "rxjs";
 
 @Component({
   selector: 'sh-evidence',
@@ -18,10 +17,12 @@ export class EvidenceComponent implements OnInit{
   private supportKeywords;
   private mainKeyword;
   private clusterKeywords;
+  private network: FirebaseObjectObservable <any>;
 
   constructor (es:EvidenceService, af: AngularFire) {
     this.evidenceService = es;
     this.angularFire = af;
+    this.network = af.database.object('Evidence/Corpus/network-graph');
   }
 
   ngOnInit() {
@@ -45,6 +46,9 @@ export class EvidenceComponent implements OnInit{
   onIDFs() {
     this.evidenceService.saveIDFs();
   }
+  onSummary() {
+    this.evidenceService.summaryTest();
+  }
 
   buildCorpus() {
     this.evidenceService.corpusBuilder(this.mainKeyword, this.supportKeywords);
@@ -54,7 +58,10 @@ export class EvidenceComponent implements OnInit{
     const self = this;
     this.evidenceService.clusterBuilder(this.mainKeyword, this.clusterKeywords)
     .then(data => {
-      setTimeout(function() { self.modal.showModal(data[0]); }, 15000);
+      setTimeout(function() {
+        self.network.set(data[0]);
+        self.modal.showModal(data[0]);
+      }, 35000);
       // this.visNetworkService.setData("idOfYourNetwork", data);
     });
   }
