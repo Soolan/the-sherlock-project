@@ -31,6 +31,7 @@ export class ReportComponent implements OnInit {
   }
 
   setReport(template) {
+    console.log(this.setCluster(template));
     this.reports.push({
       general: this.setGeneral(template),
       corpus:  this.setCorpus(template),

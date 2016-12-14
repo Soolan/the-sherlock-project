@@ -6,13 +6,16 @@
   <ol class="spine" *ngIf="cluster.clusters">
     <li *ngFor="let c of cluster.clusters">
       <h1>{{c.name}}</h1>
-      <div *ngFor="let node of c.nodes; let i=index" class="node">
+      <div  *ngIf="!c.nodes"> select article nodes option </div>
+      <div  *ngIf="c.nodes">
+        <div *ngFor="let node of c.nodes; let i=index" class="node">
         <h5>
           <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
           <strong>node {{i+1 }}: </strong>
           Words: {{node.word_count}}, Distance:{{node.distance}},
           URL:{{node.link| slice:0:55 }} {{node.link.length < 55 ? '' : '...'}}
         </h5>
+      </div>
       </div>
     </li>
   </ol>

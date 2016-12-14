@@ -88,6 +88,7 @@ export class ReportService{
     let nodes = [];
     let reportNodes = [];
     let reportClusters = [];
+    let cluster = {};
     if (template.rootNode) {
       this.angularFire.database
         .list('Evidence/Corpus/network-graph/nodes')
@@ -107,26 +108,38 @@ export class ReportService{
       this.angularFire.database
         .list('Evidence/Corpus/network-graph/edges')
         .subscribe(data => {
-          centers.forEach(c => {
-            reportNodes = [];
-            data.forEach (d => {
-              if (c.id == d.from) {
-                let node = nodes.filter(function(obj){return obj.id == d.to;})[0];
-                let link = node.title[0];
-                let wordCount = node.label.split("\n")[1];
-                let distance = d.label;
-                let mainPhrases = this.getPhrases(node.title[1], root, null);
-                let keyPhrases = this.getPhrases(node.title[1], c.label, null);
-                reportNodes.push({
-                  word_count: wordCount, distance: distance, link: link,
-                  main_phrases: mainPhrases, keyword_phrases: keyPhrases
-                })
+          if (template.clusterNode) {
+            centers.forEach(c => {
+              reportNodes = [];
+              if (template.articleNode.show) {
+                data.forEach(d => {
+                  if (c.id == d.from) {
+                    let node = nodes.filter(function (obj) {
+                      return obj.id == d.to;
+                    })[0];
+                    let link = (template.articleNode.url)?node.title[0]:'';
+                    let wordCount = (template.articleNode.size)?node.label.split("\n")[1]:'';
+                    let distance = (template.articleNode.distance)?d.label:'';
+                    let mainPhrases = (template.maxRootPhrases>0)?
+                      this.getPhrases(node.title[1], root, template.maxRootPhrases):'';
+                    let keyPhrases = (template.maxCenterPhrases>0)?
+                      this.getPhrases(node.title[1], c.label, template.maxCenterPhrases):'';
+                    reportNodes.push({
+                      word_count: wordCount, distance: distance, link: link,
+                      main_phrases: mainPhrases, keyword_phrases: keyPhrases
+                    })
+                  }
+                });
               }
+              reportClusters.push({
+                name: c.label, nodes: reportNodes
+              })
             });
+          } else {
             reportClusters.push({
-              name: c.label, nodes: reportNodes
+              name: 'cluster node is not selected', nodes: null
             })
-          })
+          }
         });
     }
     else {
