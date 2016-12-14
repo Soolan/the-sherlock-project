@@ -13,10 +13,9 @@ export class EvidenceService implements OnInit {
   private vocabularySize;
   private corpusSize;
   private angularFire;
+  private stats: FirebaseObjectObservable <any>;
   private corpus: FirebaseListObservable <any>;
   private IDFs: FirebaseListObservable <any>;
-  private summary: FirebaseObjectObservable <any>;
-  private sumTest = [];
   private clusters;
   private colors = [{
     border: '#555555',
@@ -54,8 +53,9 @@ export class EvidenceService implements OnInit {
   constructor(http: Http, af: AngularFire) {
     this.http = http;
     this.angularFire = af;
-    this.corpus = af.database.list('Evidence/Corpus/Articles');//.remove();
-    this.IDFs = af.database.list('Evidence/Corpus/IDFs');//.remove();
+    this.stats = af.database.object('Evidence/Corpus/Stats');
+    this.corpus = af.database.list('Evidence/Corpus/Articles');
+    this.IDFs = af.database.list('Evidence/Corpus/IDFs');
   }
 
   ngOnInit() {
@@ -172,7 +172,7 @@ export class EvidenceService implements OnInit {
       "&format=json&diagnostics=true&callback=";
   }
 
-  saveIDFs() {
+  saveIDFs(mainKeyword) {
     var uniqueBagOfWords = {};
     this.IDFs.remove();
     this.corpus._ref.once("value")
@@ -212,31 +212,15 @@ export class EvidenceService implements OnInit {
             }
           })
         });
-      });
-  }
-
-  summaryTest() {
-    // corpus size
-    // vocabulary
-    // top 10 frequent words in the corpus
-    // top 10 words with highest IDF
-    // longest article link + word count + unique words
-    // shortest article link + word count + unique words
-    // main keyword
-    // cluster centers
-    // articles for each center: no. of words + link + distance + summary (lets say 10 bullets)
-    this.IDFs._ref.orderByChild("IDF")
-      .startAt(4)/*.endAt(20)*/.limitToLast(300).once("value")
-      .then(snapshot => {
-        snapshot.forEach(item => {
-          this.sumTest.push({
-            docs:item.child('doc_with_word').val(),
-            word:item.child('word').val(),
-            idf:item.child('IDF').val()
-          })
+        this.stats.set({
+          corpusSize: this.corpusSize,
+          mainKeyword: mainKeyword,
+          vocabularySize: this.vocabularySize
         });
       });
   }
+
+
 
   getIDF(word, IDFs) {
     var idf = 0;
@@ -256,7 +240,6 @@ export class EvidenceService implements OnInit {
     // 2. Pass the link to EvidenceService for extracting contents
     // 3. Save them under corpus key for further calculation
     var keywords = this.setKeywordArray(mainKeyword, supportKeywords);
-    console.log(keywords);
     keywords.forEach((keyword: any) => {
       this.fetchLinks(keyword);
     })
@@ -337,6 +320,8 @@ export class EvidenceService implements OnInit {
                 bag_of_words: article.child('bag_of_words').val()
               }
             }
+            edges.push({from: 1, to: currentCenterId, width: 2});
+            return clusterCenters;
           })
           currentCenterId = id++; //clusterCenters[word].id;
           nodes.push({
@@ -382,13 +367,6 @@ export class EvidenceService implements OnInit {
 
                 var node = nodes.find(node => node.label === word);
                 observations[word].forEach(item => {
-                  // console.log(
-                  //   'link: ',item.link,
-                  //   'color index: ', colorIndex,
-                  //   'color object:', self.colors[colorIndex],
-                  //   'colors: ', self.colors
-                  // );
-
                   nodes.push({
                     id: id /*item.id won't work here. Because it should be unique and
                     chances are it won't be. (An article - depend on the distance - can
@@ -418,16 +396,10 @@ export class EvidenceService implements OnInit {
                   id++;
                 });
                 colorIndex ++;
-                console.log(id,'word:'+word,'neighbors:',
-                  observations[word],'nodes:',nodes,'edges:',edges);
-                // return observations[word];
               })
           })// calculate distance to the centers for all articles in the corpus
 
-      network = {nodes: nodes, edges: edges};
-
-      console.log('[in service] network:', network);
-      return network;
+      network = {nodes: nodes, edges: edges};      return network;
     }));
   }
 }
