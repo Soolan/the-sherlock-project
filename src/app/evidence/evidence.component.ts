@@ -43,7 +43,7 @@ export class EvidenceComponent implements OnInit{
   }
 
   onIDFs() {
-    this.evidenceService.saveIDFs();
+    this.evidenceService.saveIDFs(this.mainKeyword);
   }
 
   buildCorpus() {

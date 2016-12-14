@@ -2,7 +2,7 @@ import {Injectable, OnInit} from "@angular/core";
 import forEach = require("core-js/fn/array/for-each");
 import {Response, Http} from "@angular/http";
 import {Observable} from "rxjs";
-import {AngularFire, FirebaseListObservable} from "angularfire2";
+import {AngularFire, FirebaseListObservable, FirebaseObjectObservable} from "angularfire2";
 import {googleSearchConfig, timeSpans} from "../app.module";
 
 @Injectable()
@@ -13,9 +13,10 @@ export class EvidenceService implements OnInit {
   private vocabularySize;
   private corpusSize;
   private angularFire;
+  private stats: FirebaseObjectObservable <any>;
   private corpus: FirebaseListObservable <any>;
   private IDFs: FirebaseListObservable <any>;
-  private clusters;//: FirebaseListObservable <any>;
+  private clusters;
   private colors = [{
     border: '#555555',
     background: '#BBBBBB',
@@ -52,8 +53,9 @@ export class EvidenceService implements OnInit {
   constructor(http: Http, af: AngularFire) {
     this.http = http;
     this.angularFire = af;
-    this.corpus = af.database.list('Evidence/Corpus/Articles');//.remove();
-    this.IDFs = af.database.list('Evidence/Corpus/IDFs');//.remove();
+    this.stats = af.database.object('Evidence/Corpus/Stats');
+    this.corpus = af.database.list('Evidence/Corpus/Articles');
+    this.IDFs = af.database.list('Evidence/Corpus/IDFs');
   }
 
   ngOnInit() {
@@ -168,13 +170,7 @@ export class EvidenceService implements OnInit {
       "&format=json&diagnostics=true&callback=";
   }
 
-  // 1. loop through articles
-  // 2. gather all unique words by looking into bag_of_words for each article
-  // 3. loop through unique words
-  // 4. find number of articles that each unique word exists in
-  // 5. calculate idf
-  // 6. save IDFs as array of {word:'', number_of_docs:'', idf:''}
-  saveIDFs() {
+  saveIDFs(mainKeyword) {
     var uniqueBagOfWords = {};
     this.IDFs.remove();
     this.corpus._ref.once("value")
@@ -207,6 +203,11 @@ export class EvidenceService implements OnInit {
             }
           })
         });
+        this.stats.set({
+          corpusSize: this.corpusSize,
+          mainKeyword: mainKeyword,
+          vocabularySize: this.vocabularySize
+        });
       });
   }
 
@@ -228,7 +229,6 @@ export class EvidenceService implements OnInit {
     // 2. Pass the link to EvidenceService for extracting contents
     // 3. Save them under corpus key for further calculation
     var keywords = this.setKeywordArray(mainKeyword, supportKeywords);
-    console.log(keywords);
     keywords.forEach((keyword: any) => {
       this.fetchLinks(keyword);
     })
@@ -321,7 +321,6 @@ export class EvidenceService implements OnInit {
               font: {size: 28},
             });
             edges.push({from: 1, to: currentCenterId, width: 2});
-            console.log('first then:',clusterCenters);
             return clusterCenters;
           })
           .then(centers => {
@@ -355,13 +354,6 @@ export class EvidenceService implements OnInit {
 
                 var node = nodes.find(node => node.label === word);
                 observations[word].forEach(item => {
-                  // console.log(
-                  //   'link: ',item.link,
-                  //   'color index: ', colorIndex,
-                  //   'color object:', self.colors[colorIndex],
-                  //   'colors: ', self.colors
-                  // );
-
                   nodes.push({
                     id: id /*item.id*/,
                     label: (item.link)?item.link
@@ -389,33 +381,13 @@ export class EvidenceService implements OnInit {
                   id++;
                 });
                 colorIndex ++;
-                console.log(id,'word:'+word,'neighbors:',
-                  observations[word],'nodes:',nodes,'edges:',edges);
-                // return observations[word];
               })
           })// calculate distance to the centers for all articles in the corpus
 
       network = {nodes: nodes, edges: edges};
-      // self.clusters = {nodes: nodes, edges: edges};
-      console.log('[in service] network:', network);
       return network;
       })
     );
   }
-
-  // getPoints(contents,word) {
-  //   var start, end;
-  //   var l = contents.length;
-  //   var points = [];
-  //   for(var pos = contents.indexOf(word);
-  //       pos !== -1;
-  //       pos = contents.indexOf(word, pos+1)) {
-  //     (pos < 30)? start = 0 : start = pos - 30;
-  //     (pos > l - 40)? end = l : end = pos + 40;
-  //     console.log('getPoints: ', points, pos, start, end, l);
-  //     points.push('...'+contents.substring(start,end)+'...');
-  //   }
-  //   return points;
-  // }
 }
 
