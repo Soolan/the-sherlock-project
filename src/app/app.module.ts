@@ -26,6 +26,7 @@ import {ReportGeneralComponent} from "./report/report-general.component";
 import {ReportCorpusComponent} from "./report/report-corpus.component";
 import {ReportClusterComponent} from "./report/report-cluster.component";
 import {ReportService} from "./report/report.service";
+import {AccuracyComponent} from "./accuracy/accuracy.component";
 
 export const firebaseConfig = {
   apiKey: "AIzaSyA8C9a7wZ9r-5BsMXJbP3-6_raliTVkHpk",
@@ -58,7 +59,8 @@ export const timeSpans = [
     RatingComponent, NotifierComponent, EvidenceComponent,
     OrderByPipe, ModalComponent, ReportComponent,
     ReportTemplateComponent, ReportGeneralComponent,
-    ReportCorpusComponent, ReportClusterComponent
+    ReportCorpusComponent, ReportClusterComponent,
+    AccuracyComponent
   ],
   schemas     : [CUSTOM_ELEMENTS_SCHEMA],
   imports     : [
