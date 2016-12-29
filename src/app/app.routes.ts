@@ -4,7 +4,6 @@ import {RatingComponent} from "./rating/rating.component";
 import {NotifierComponent} from "./notifier/notifier.component";
 import {EvidenceComponent} from "./evidence/evidence.component";
 import {AccuracyComponent} from "./accuracy/accuracy.component";
-
 import {ReportComponent} from "./report/report.component";
 
 export const rootRouterConfig: Routes = [

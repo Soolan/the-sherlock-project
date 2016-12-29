@@ -29,7 +29,12 @@
     </div>
     <div class="col-md-6">
       <div class="panel panel-default">
-        <div class="panel-heading">Cure</div>
+        <div class="panel-heading">
+          Cure
+          <button type="button" class="btn btn-default btn-xs pull-right" (click)="newReportTemplate()">
+            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+          </button>
+        </div>
         <div class="panel-body">
           <p>This is where we cure incidents in our application</p>
         </div>
@@ -38,13 +43,18 @@
           <thead><tr>
             <th>#</th>
             <th>Description</th>
-            <th>Edit/Delete</th>
+            <th></th>
           </tr></thead>
           <tbody>
           <tr>
             <th scope="row">1</th>
-            <td>some description</td>
-            <td>4 times</td>
+            <td contenteditable="true">some description</td>
+            <td>
+              <button class="btn btn-default btn-xs pull-right" type="button"
+                      (click)="deleteReportTemplate(model)">
+                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+              </button>
+            </td>
           </tr>
           </tbody>
         </table>
