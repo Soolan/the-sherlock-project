@@ -14,14 +14,14 @@
             <th>Hits</th>
           </tr></thead>
           <tbody>
-          <tr>
-            <th scope="row">1</th>
+          <tr *ngFor="let p of prevents; let i=index">
+            <th scope="row">{{i+1}}</th>
             <td>
-              <span class="desc">some description</span><br>
-              <span class="file">Report Service</span>
-              <span class="line_no">line 87</span>
+              <span class="desc">p.description</span><br>
+              <span class="file">p.loc</span>
+              <span class="line_no">p.line</span>
             </td>
-            <td>4 times</td>
+            <td>p.hits</td>
           </tr>
           </tbody>
         </table>
@@ -31,7 +31,7 @@
       <div class="panel panel-default">
         <div class="panel-heading">
           Cure
-          <button type="button" class="btn btn-default btn-xs pull-right" (click)="newReportTemplate()">
+          <button type="button" class="btn btn-default btn-xs pull-right" (click)="newCure()">
             <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
           </button>
         </div>
@@ -46,12 +46,12 @@
             <th></th>
           </tr></thead>
           <tbody>
-          <tr>
-            <th scope="row">1</th>
-            <td contenteditable="true">some description</td>
+          <tr *ngFor="let c of cures; let i=index">
+            <th scope="row">{{i+1}}</th>
+            <td contenteditable="true" (input)="editCure($event, c.id)">c.description</td>
             <td>
               <button class="btn btn-default btn-xs pull-right" type="button"
-                      (click)="deleteReportTemplate(model)">
+                      (click)="deleteCure(c.id)">
                 <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
               </button>
             </td>
