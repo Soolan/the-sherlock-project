@@ -17,11 +17,11 @@
           <tr *ngFor="let p of prevents; let i=index">
             <th scope="row">{{i+1}}</th>
             <td>
-              <span class="desc">p.description</span><br>
-              <span class="file">p.loc</span>
-              <span class="line_no">p.line</span>
+              <span class="desc">{{p.description}}</span><br>
+              <span class="file">{{p.file}}</span>
+              <span class="line_no">{{p.line}}</span>
             </td>
-            <td>p.hits</td>
+            <td>{{p.hits}}</td>
           </tr>
           </tbody>
         </table>
@@ -41,17 +41,19 @@
         <!-- Table -->
         <table class="table">
           <thead><tr>
-            <th>#</th>
+            <th class="text-center">id</th>
             <th>Description</th>
             <th></th>
           </tr></thead>
           <tbody>
-          <tr *ngFor="let c of cures; let i=index">
-            <th scope="row">{{i+1}}</th>
-            <td contenteditable="true" (input)="editCure($event, c.id)">c.description</td>
-            <td>
+          <tr *ngFor="let c of items">
+            <th scope="row" class="col-md-4"><span class="id">{{c.$key}}</span></th>
+            <td class="col-md-7" contenteditable="true" (keyup.enter)="editCure($event, c.$key)">
+              {{c.description}}
+            </td>
+            <td class="col-md-1">
               <button class="btn btn-default btn-xs pull-right" type="button"
-                      (click)="deleteCure(c.id)">
+                      (click)="deleteCure(c.$key)">
                 <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
               </button>
             </td>

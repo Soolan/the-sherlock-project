@@ -27,6 +27,7 @@ import {ReportCorpusComponent} from "./report/report-corpus.component";
 import {ReportClusterComponent} from "./report/report-cluster.component";
 import {ReportService} from "./report/report.service";
 import {AccuracyComponent} from "./accuracy/accuracy.component";
+import {AccuracyService} from "./accuracy/accuracy.service";
 
 export const firebaseConfig = {
   apiKey: "AIzaSyA8C9a7wZ9r-5BsMXJbP3-6_raliTVkHpk",
@@ -53,6 +54,10 @@ export const timeSpans = [
   {"span":"y10","sort":"date:a"}
 ];
 
+export let preventions = [
+  {"id":"tuytu", "description":"blah", "file":"ttt", "line":"55", "hits":"6"}
+];
+
 @NgModule({
   declarations: [
     AppComponent, NavigationComponent, CollectorComponent,
@@ -72,7 +77,7 @@ export const timeSpans = [
   providers   : [
     {provide: LocationStrategy, useClass: HashLocationStrategy},
     CollectorService, RatingService, RatingLogic, NotifierService,
-    EvidenceService, ReportService
+    EvidenceService, ReportService, AccuracyService
   ],
   bootstrap   : [AppComponent]
 })

@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {AngularFire, FirebaseListObservable} from "angularfire2";
+import {AccuracyService} from "./accuracy.service";
 
 @Component({
   selector: 'sh-accuracy',
@@ -9,25 +10,25 @@ import {AngularFire, FirebaseListObservable} from "angularfire2";
 export class AccuracyComponent implements OnInit {
   private prevents = [];
   private cures: FirebaseListObservable<any>;
-  private angularFire;
-  constructor(af: AngularFire) {
-    this.angularFire = af;
+  private items;
+  constructor(af: AngularFire, as: AccuracyService) {
+    this.cures = af.database.list('/Accuracy/cures');
+    this.prevents = as.getPrevents();
   }
 
   ngOnInit() {
-    this.angularFire.database
-      .list('/Accuracy/cures')
+    this.cures
       .subscribe(data => {
-        this.cures = data
+        this.items = data
       })
   }
 
   newCure() {
-    this.cures.push({description:'new cure'})
+    this.cures.push({description:'new cure', implemented:'false'})
   }
 
   editCure(event, id) {
-    this.cures.update(id, {description:event.target.outerText});
+    this.cures.update(id, {description: event.target.outerText});
   }
 
   deleteCure(id) {
