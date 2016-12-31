@@ -27,8 +27,10 @@ export class AccuracyComponent implements OnInit {
     this.cures.push({description:'new cure', implemented:'false'})
   }
 
-  editCure(event, id) {
-    this.cures.update(id, {description: event.target.outerText});
+  editCure(id, event=null, implemented=false) {
+    (event)?
+      this.cures.update(id, {description: event.target.outerText}):
+      this.cures.update(id, {implemented:implemented})
   }
 
   deleteCure(id) {

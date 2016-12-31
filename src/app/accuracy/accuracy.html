@@ -48,7 +48,7 @@
           <tbody>
           <tr *ngFor="let c of items">
             <th scope="row" class="col-md-4"><span class="id">{{c.$key}}</span></th>
-            <td class="col-md-7" contenteditable="true" (keyup.enter)="editCure($event, c.$key)">
+            <td class="col-md-7" contenteditable="true" (keyup.enter)="editCure(c.$key, $event)">
               {{c.description}}
             </td>
             <td class="col-md-1">

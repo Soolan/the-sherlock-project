@@ -54,9 +54,9 @@ export const timeSpans = [
   {"span":"y10","sort":"date:a"}
 ];
 
-export let preventions = [
-  {"id":"tuytu", "description":"blah", "file":"ttt", "line":"55", "hits":"6"}
-];
+export let preventions = [];
+  // {id:"", description:"", file:"", line:"", variables:"", hits:""}
+
 
 @NgModule({
   declarations: [
