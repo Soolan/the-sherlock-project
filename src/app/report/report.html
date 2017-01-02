@@ -26,7 +26,8 @@
         <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
       </button>
     </div>
-    <div *ngFor="let report of items; let i=index" id="{{report.$key}}" class="tab-pane fade">
+    <div
+      id="{{report.$key}}" class="tab-pane fade">
       <sh-report-general [general]="reports[i].general"></sh-report-general>
       <sh-report-corpus [corpus]="reports[i].corpus"></sh-report-corpus>
       <sh-report-cluster [cluster]="reports[i].cluster"></sh-report-cluster>
