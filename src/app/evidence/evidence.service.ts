@@ -1,12 +1,13 @@
-import {Injectable, OnInit} from "@angular/core";
+import {Injectable} from "@angular/core";
 import forEach = require("core-js/fn/array/for-each");
 import {Response, Http} from "@angular/http";
 import {Observable} from "rxjs";
 import {AngularFire, FirebaseListObservable, FirebaseObjectObservable} from "angularfire2";
-import {googleSearchConfig, timeSpans} from "../app.module";
+import {googleSearchConfig, timeSpans, articleRange} from "../app.module";
+import {AccuracyService} from "../accuracy/accuracy.service";
 
 @Injectable()
-export class EvidenceService implements OnInit {
+export class EvidenceService {
   private http;
   private article = '';
   private words = [];
@@ -48,17 +49,15 @@ export class EvidenceService implements OnInit {
     highlight: { border: '#2B7CE9', background: '#D2E5FF' },
     hover: { border: '#2B7CE9', background: '#D2E5FF' }
   }];
+  private accuracy;
 
-
-  constructor(http: Http, af: AngularFire) {
+  constructor(http: Http, af: AngularFire, as: AccuracyService) {
     this.http = http;
     this.angularFire = af;
     this.stats = af.database.object('Evidence/Corpus/Stats');
     this.corpus = af.database.list('Evidence/Corpus/Articles');
     this.IDFs = af.database.list('Evidence/Corpus/IDFs');
-  }
-
-  ngOnInit() {
+    this.accuracy = as;
   }
 
   wordAnalyzer(url) {
@@ -66,7 +65,18 @@ export class EvidenceService implements OnInit {
       .subscribe( data => {
         this.resetCounters();
         this.findKey(data, 'content');
-        if (this.article) {
+
+        if (this.article.length < articleRange.min ||
+          this.article.length > articleRange.max) {
+          this.accuracy.takeSnapshot(
+            '-K_PGziSD-d53wQRrEMl',
+            'Cure for article length problem',
+            'evidence.service.ts', 77,
+            [{url: url}, {data: data}]
+          )
+        }
+
+        else {
           this.evaluateWords( // normalizeWords
             this.countInstances(
               this.extractWords(this.article)
@@ -119,7 +129,7 @@ export class EvidenceService implements OnInit {
         key != 'id' &&
         key != 'href'
       ) {
-        this.article += object[key];
+        this.article += object[key]+' ';
       }
     }
   }

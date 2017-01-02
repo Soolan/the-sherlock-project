@@ -26,6 +26,8 @@ import {ReportGeneralComponent} from "./report/report-general.component";
 import {ReportCorpusComponent} from "./report/report-corpus.component";
 import {ReportClusterComponent} from "./report/report-cluster.component";
 import {ReportService} from "./report/report.service";
+import {AccuracyComponent} from "./accuracy/accuracy.component";
+import {AccuracyService} from "./accuracy/accuracy.service";
 
 export const firebaseConfig = {
   apiKey: "AIzaSyA8C9a7wZ9r-5BsMXJbP3-6_raliTVkHpk",
@@ -45,12 +47,16 @@ export const googleSearchConfig = {
 
 export const timeSpans = [
   {"span":"d1", "sort":"date:d"},
-  {"span":"w1", "sort":"date:a"},
+  //{"span":"w1", "sort":"date:a"},
   {"span":"m1", "sort":"date:a"},
-  {"span":"m6", "sort":"date:a"},
+  //{"span":"m6", "sort":"date:a"},
   {"span":"y1", "sort":"date:a"},
   {"span":"y10","sort":"date:a"}
 ];
+
+export let preventions = [];
+
+export const articleRange = {min: 100, max: 10000}; // characters
 
 @NgModule({
   declarations: [
@@ -58,7 +64,8 @@ export const timeSpans = [
     RatingComponent, NotifierComponent, EvidenceComponent,
     OrderByPipe, ModalComponent, ReportComponent,
     ReportTemplateComponent, ReportGeneralComponent,
-    ReportCorpusComponent, ReportClusterComponent
+    ReportCorpusComponent, ReportClusterComponent,
+    AccuracyComponent
   ],
   schemas     : [CUSTOM_ELEMENTS_SCHEMA],
   imports     : [
@@ -70,7 +77,7 @@ export const timeSpans = [
   providers   : [
     {provide: LocationStrategy, useClass: HashLocationStrategy},
     CollectorService, RatingService, RatingLogic, NotifierService,
-    EvidenceService, ReportService
+    EvidenceService, ReportService, AccuracyService
   ],
   bootstrap   : [AppComponent]
 })
