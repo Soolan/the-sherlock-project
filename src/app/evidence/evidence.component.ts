@@ -39,15 +39,12 @@ export class EvidenceComponent implements OnInit{
   }
 
   onSelect(item, isRadio){
-    var url = isRadio?item.link:item;
+    let url = isRadio?item.link:item;
     this.evidenceService.wordAnalyzer(url);
   }
 
   onIDFs() {
     this.evidenceService.saveIDFs(this.mainKeyword);
-  }
-  onSummary() {
-    this.evidenceService.summaryTest();
   }
 
   buildCorpus() {

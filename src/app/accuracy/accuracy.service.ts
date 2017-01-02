@@ -4,17 +4,26 @@ import {preventions} from '../app.module'
 @Injectable()
 export class AccuracyService {
   private prevents = preventions;
-  private hits = [];
-  constructor() {
-    preventions.push(
-      {id:"888", description:"oh yah", file:"fdty", line:"76", hits:"3",
-        variables:[{key:"helo", val:"blo"}]
+  constructor() {}
+  takeSnapshot(id, description, file, line, variables) {
+    if (preventions.length == 0){
+      preventions.push({
+        id:id, description:description, file:file,
+        line:line, hits:1, variables:[variables]
       })
-  }
-
-  takeSnapshot(id, file, line, variables, description) {
-    // if id exists increment the hit count and push vars to the var array
-    // else add the new id with its properties
+    } else {
+      let p = (preventions.find( item => item.id == id));
+      if (p){
+        p.hits++;
+        p.variables.push(variables);
+      } else {
+        preventions.push({
+          id:id, description:description, file:file,
+          line:line, hits:1, variables:[variables]
+        });
+      }
+    }
+    console.log(preventions);
   }
 
   getPrevents() {
